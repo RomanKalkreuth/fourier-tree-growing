@@ -1,4 +1,4 @@
-#from ucimlrepo import fetch_ucirepo
+from ucimlrepo import fetch_ucirepo
 class BenchmarkReader:
     """
 
@@ -9,7 +9,13 @@ class BenchmarkReader:
 
         """
 
-    def read_file(self, benchmark, file_path, num_inputs, num_outputs, separator, omit_header):
+    def read_from_repo(self, benchmark, id):
+        """
+        :param benchmark
+        :param id
+        """
+
+    def read_from_file(self, benchmark, file_path, num_inputs, num_outputs, separator, omit_header):
         """
 
         :param benchmark:
