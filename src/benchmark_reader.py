@@ -3,66 +3,57 @@ from benchmark import Benchmark
 import pandas as pd
 
 
-def read_from_repo(repo_id):
-    """
-    :param repo_id
-
-    :return benchmark
+class UCIMLReader:
     """
 
-    dataset = fetch_ucirepo(repo_id)
-    name = dataset.metadata.name
-    num_instances = dataset.metadata.num_instances
-    num_features = dataset.metadata.num_features
-
-    benchmark = Benchmark(dataset.data, name, num_instances, num_features)
-
-    return benchmark
-
-
-def read_from_file(file_path, name):
     """
 
-    :param file_path:
-    :param name
+    def __init__(self):
+        """
 
-    :return:
-    """
+        """
 
-    data = pd.read_csv(file_path)
+    def read_from_repo(self, repo_id):
+        """
+        :param repo_id
 
-    num_instances = len(data)
-    num_features = len(data[0])
+        :return benchmark
+        """
 
-    benchmark = Benchmark(data, name, num_instances, num_features)
+        dataset = fetch_ucirepo(repo_id)
+        name = dataset.metadata.name
+        num_instances = dataset.metadata.num_instances
+        num_features = dataset.metadata.num_features
 
-    return benchmark
+        benchmark = Benchmark(dataset.data, name, num_instances, num_features)
 
+        return benchmark
 
-def read_from_file(file_path, name, num_inputs, num_outputs, separator, omit_header):
-    """
+    def read_from_file(self, file_path, name, num_inputs=None, num_outputs=None, separator=',', omit_header=None):
+        """
 
-    :param file_path:
-    :param name
-    :param num_inputs:
-    :param num_outputs:
-    :param separator
-    :param omit_header
+        :param file_path:
+        :param name
+        :param num_inputs:
+        :param num_outputs:
+        :param separator
+        :param omit_header
 
-    :return:
-    """
-    data = []
+        :return:
+        """
 
-    with open(file_path, encoding="utf-8") as f:
-        for line in f:
-            values = line.split(separator)
-            data.append(values)
-    f.close()
+        data = pd.read_csv(file_path, sep=separator)
 
-    num_instances = len(data)
-    num_features = len(data[0])
+        num_instances = data.shape[0]
+        num_features = data.shape[1]
 
-    benchmark = Benchmark(data, name, num_instances, num_features)
+        benchmark = Benchmark(data, name, num_instances, num_features)
 
-    benchmark.init_inputs(num_inputs, data[0:num_inputs])
-    benchmark.init_outputs(num_outputs, data[num_inputs + 1:num_outputs])
+        if num_inputs is not None:
+            inputs = data.iloc[:, 0:num_inputs]
+            benchmark.init_inputs(num_inputs, inputs)
+        if num_outputs is not None:
+            outputs = data.iloc[:, num_inputs:num_inputs + num_outputs]
+            benchmark.init_outputs(num_outputs, outputs)
+
+        return benchmark

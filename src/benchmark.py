@@ -44,7 +44,7 @@ class Benchmark:
         self.outputs = np.array(data)
 
 
-    def split(self, test_size):
+    def split_data(self, test_size):
         """
 
         """
