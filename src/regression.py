@@ -1,4 +1,4 @@
-import gplearn as gpl
+from gplearn.genetic import SymbolicRegressor
 
 
 def gplearn_regressor(benchmark, population_size=5000,
@@ -10,7 +10,7 @@ def gplearn_regressor(benchmark, population_size=5000,
     """
     """
 
-    est_gp = gpl.SymbolicRegressor(population_size=population_size,
+    est_gp = SymbolicRegressor(population_size=population_size,
                                    generations=generations, stopping_criteria=stopping_criteria,
                                    p_crossover=p_crossover, p_subtree_mutation=p_subtree_mutation,
                                    p_hoist_mutation=p_hoist_mutation, p_point_mutation=p_point_mutation,

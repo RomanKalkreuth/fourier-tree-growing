@@ -7,7 +7,7 @@ def random_samples_float(min, max, n):
 
     """
     assert min < max
-    return (max - min) * np.random.random_sample(n) + max
+    return (max - min) * np.random.random_sample(n) + min
 
 
 def random_samples_int(min, max, n):
