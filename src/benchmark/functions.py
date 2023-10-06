@@ -1,5 +1,5 @@
 import math
-
+import numpy as np
 
 def koza1(x):
     """
@@ -81,3 +81,19 @@ def korns12(xs):
 
     """
     return 2.0 - (2.1 * (math.cos(9.8 * xs[0]) * math.sin(1.3 * xs[4])))
+
+def generate_function_values(function, dataset):
+    """
+
+    """
+    num_instances = len(dataset)
+    function_values = np.empty(num_instances)
+
+    for index,data in enumerate(dataset):
+        function_values[index] = function(data)
+
+    return function_values
+
+
+
+
