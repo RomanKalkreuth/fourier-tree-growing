@@ -1,18 +1,24 @@
-import seaborn as seaborn
-import matplotlib.pyplot as plt
-import numpy as np
+import plotly.express as px
+import plotly.graph_objects as go
 
-def plot2d():
+def line_plot(x, y, title=""):
     """
 
     """
+    fig = px.line(x, y, title)
+    fig.show()
 
-def plot3d():
+
+def surface_plot(x, y, z, title=""):
     """
 
     """
+    fig = go.Figure(data=[go.Surface(z=z, x=x, y=y)])
+    fig.show()
 
-def plot_surface():
+def scatter2d(x, y):
     """
 
     """
+    fig = px.scatter(x, y)
+    fig.show()

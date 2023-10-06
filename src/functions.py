@@ -22,6 +22,24 @@ def koza3(x):
     return x ** 6 - 2 * x ** 4 + x ** 2
 
 
+def nguyen7(x):
+    """
+    ln(x + 1) + ln(x^2 + 1)
+    """
+    return math.log(x + 1) + math.log(x ** 2 + 1)
+
+def nguyen9(x,y):
+    """
+
+    """
+    return math.sin(x) + math.sin(y**2)
+
+def nguyen10(x,y):
+    """
+
+    """
+    return 2*math.sin(x) + math.cos(y)
+
 def keijzer6(x):
     """
 
@@ -42,13 +60,6 @@ def vladislavleva4(xs):
         s += (xs[i] - 3) * (xs[i] - 3)
 
     return 10.0 / (5.0 + s)
-
-
-def nguyen7(x):
-    """
-    ln(x + 1) + ln(x^2 + 1)
-    """
-    return math.log(x + 1) + math.log(x ** 2 + 1)
 
 
 def pagie1(x, y):
