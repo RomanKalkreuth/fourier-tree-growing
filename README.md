@@ -1,1 +1,1 @@
-# ill-conditioned-gp-analysis
+# ill-conditioned-gp-study
