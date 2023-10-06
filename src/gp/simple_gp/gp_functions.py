@@ -11,6 +11,6 @@ def mul(x, y):
 
 
 def div(x, y):
-    if y==0:
+    if y == 0:
         return 1.0
     return x / y

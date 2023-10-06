@@ -5,7 +5,6 @@ from random import seed
 seed()
 
 tree = ParseTree()
-
 tree.init(config.MIN_DEPTH, config.MAX_DEPTH)
 
 values = {'x': 1.523}

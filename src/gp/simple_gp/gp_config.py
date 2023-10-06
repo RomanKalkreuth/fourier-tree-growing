@@ -5,6 +5,9 @@ FUNCTIONS = [gpf.add, gpf.sub, gpf.mul, gpf.div]
 TERMINALS = ['x', 0, 1]
 VARIABLES = ['x']
 
+MU = 1
+LAMBDA = 1
+
 MIN_DEPTH = 2
 MAX_DEPTH = 6
 SUBTREE_DEPTH = 2
