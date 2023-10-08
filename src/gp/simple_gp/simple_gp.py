@@ -6,9 +6,15 @@ seed()
 
 tree = ParseTree()
 tree.init(config.MIN_DEPTH, config.MAX_DEPTH)
+tree.print_tree()
+size = tree.size()
+depth = tree.height()
 
-values = {'x': 1.523}
+print(size)
+print(depth)
 
-fitness = tree.evaluate(values)
-print(fitness)
+#values = {'x': 1.523}
+
+#fitness = tree.evaluate(values)
+#print(fitness)
 

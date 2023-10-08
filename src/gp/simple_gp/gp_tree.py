@@ -1,4 +1,5 @@
 import gp_config as config
+import gp_mutation as mutation
 from random import random, randint
 
 
@@ -7,13 +8,14 @@ class ParseTree:
 
     """
 
-    def __init__(self, data=None, left=None, right=None):
+    def __init__(self, data=None, left=None, right=None, parent=None):
         """
 
         """
         self.data = data
         self.left = left
         self.right = right
+        self.parent = parent
 
     def annotation(self):
         """
@@ -35,12 +37,12 @@ class ParseTree:
         else:
             return self.data
 
-    def print_tree(self, term="", level=0):
+    def print_tree(self, term="", size=0, level=0):
         print("%s%s" % (term, self.annotation()))
         if self.left is not None:
-            self.left.print_tree(term + "   ")
+            self.left.print_tree(term + "   ", size)
         if self.right is not None:
-            self.right.print_tree(term + "   ")
+            self.right.print_tree(term + "   ", size)
 
     def init(self, min_depth, max_depth):
         """
@@ -49,11 +51,11 @@ class ParseTree:
         depth = randint(min_depth, max_depth)
 
         if random() < 0.5:
-            self.gen_random_tree(grow=True, max_depth=depth, depth=0)
+            self.generate_random_tree(grow=True, max_depth=depth, depth=0)
         else:
-            self.gen_random_tree(grow=False, max_depth=depth, depth=0)
+            self.generate_random_tree(grow=False, max_depth=depth, depth=0)
 
-    def gen_random_tree(self, grow, max_depth, depth=0):
+    def generate_random_tree(self, grow, max_depth, depth=0):
         """
 
         """
@@ -70,22 +72,40 @@ class ParseTree:
 
             if self.data in config.FUNCTIONS:
                 self.left = ParseTree()
-                self.left.gen_random_tree(grow, max_depth, depth =depth + 1)
+                self.left.parent = self.data
+                self.left.generate_random_tree(grow, max_depth, depth=depth + 1)
 
                 self.right = ParseTree()
-                self.right.gen_random_tree(grow, max_depth, depth =depth + 1)
+                self.right.parent = self.data
+                self.right.generate_random_tree(grow, max_depth, depth=depth + 1)
+
+    def size(self, left=0, right=0):
+        """
+
+        """
+        if self.data is None:
+            return 0
+
+        if self.left is not None:
+            left = self.left.size()
+        if self.right is not None:
+            right = self.right.size()
+
+        return 1 + left + right
+
+    def height(self, left=0, right=0):
+        """
+
+        """
+        if self.left is not None:
+            left = self.left.height()
+        if self.right is not None:
+            right = self.right.height()
+
+        return max(left + 1, right + 1)
 
     def mutate(self):
         """
 
         """
-        self.subtree_mutation()
-
-    def subtree_mutation(self):
-        """
-
-        """
-        if random() < config.MUTATION_RATE:
-            self.gen_random_tree(grow=True, max_depth=config.SUBTREE_DEPTH)
-        elif self.left: self.left.subtree_mutation()
-        elif self.right: self.right.subtree_mutation()
+        mutation.subtree_mutation(self)
