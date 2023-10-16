@@ -1,6 +1,7 @@
 import math
 import numpy as np
 
+
 def koza1(x):
     """
     x^4 + x^3 + x^2 + x
@@ -28,17 +29,20 @@ def nguyen7(x):
     """
     return math.log(x + 1) + math.log(x ** 2 + 1)
 
-def nguyen9(x,y):
+
+def nguyen9(x, y):
     """
 
     """
-    return math.sin(x) + math.sin(y**2)
+    return math.sin(x) + math.sin(y ** 2)
 
-def nguyen10(x,y):
+
+def nguyen10(x, y):
     """
 
     """
-    return 2*math.sin(x) + math.cos(y)
+    return 2 * math.sin(x) + math.cos(y)
+
 
 def keijzer6(x):
     """
@@ -82,6 +86,7 @@ def korns12(xs):
     """
     return 2.0 - (2.1 * (math.cos(9.8 * xs[0]) * math.sin(1.3 * xs[4])))
 
+
 def generate_function_values(function, dataset):
     """
 
@@ -89,11 +94,7 @@ def generate_function_values(function, dataset):
     num_instances = len(dataset)
     function_values = np.empty(num_instances)
 
-    for index,data in enumerate(dataset):
+    for index, data in enumerate(dataset):
         function_values[index] = function(data)
 
     return function_values
-
-
-
-

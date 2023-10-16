@@ -25,7 +25,7 @@ class UCIMLReader:
         num_instances = dataset.metadata.num_instances
         num_features = dataset.metadata.num_features
 
-        benchmark = Benchmark(dataset.data, name, num_instances, num_features)
+        benchmark = Benchmark(dataset.get_symbol, name, num_instances, num_features)
 
         return benchmark
 

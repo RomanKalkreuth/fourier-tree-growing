@@ -5,13 +5,17 @@ from random import seed
 seed()
 
 tree = ParseTree()
+
 tree.init(config.MIN_DEPTH, config.MAX_DEPTH)
+
 tree.print_tree()
+
 size = tree.size()
 depth = tree.height()
 
-print(size)
-print(depth)
+subtree = tree.subtree(node=3)
+
+subtree.print_tree()
 
 #values = {'x': 1.523}
 

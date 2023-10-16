@@ -1,5 +1,18 @@
-def evaluate(self, individual, dataset):
-    return sum([abs(individual.evaluate(ds[0]) - ds[1]) for ds in dataset])
+def absolute_error(self, individual, dataset):
+    """
+
+    """
+    return sum([abs(individual.absolute_error(ds[0]) - ds[1]) for ds in dataset])
+
+def mean_squared_error(self, individual, dataset):
+    """
+
+    """
+
+def root_mean_squared_error(self, individual, dataset):
+    """
+
+    """
 
 
 def is_better(fitness1, fitness2, minimizing_fitness=True, strict=True):

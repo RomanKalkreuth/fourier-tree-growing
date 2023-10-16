@@ -1,8 +1,5 @@
-from benchmark_reader import UCIMLReader
-import dataset_generator as dg
-import functions as fn
+from src.benchmark import dataset_generator as dg, functions as fn
 import matplotlib.pyplot as plt
-import numpy as np
 
 #reader = UCIMLReader()
 #benchmark = reader.read_from_file('../benchmarks/regression/uciml/airfoil_self_noise.dat',

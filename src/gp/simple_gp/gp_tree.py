@@ -1,6 +1,8 @@
 import gp_config as config
 import gp_mutation as mutation
+import util.tree_print as printer
 from random import random, randint
+import queue
 
 
 class ParseTree:
@@ -12,37 +14,33 @@ class ParseTree:
         """
 
         """
-        self.data = data
+        self.symbol = data
         self.left = left
         self.right = right
         self.parent = parent
 
-    def annotation(self):
+    def get_symbol(self):
         """
 
         """
-        if self.data in config.FUNCTIONS:
-            return self.data.__name__
+        if self.symbol in config.FUNCTIONS:
+            return self.symbol.__name__
         else:
-            return str(self.data)
+            return str(self.symbol)
 
     def evaluate(self, variables):
         """
 
         """
-        if self.data in config.FUNCTIONS:
-            return self.data(self.left.evaluate(variables), self.right.evaluate(variables))
-        elif self.data in variables:
-            return variables[self.data]
+        if self.symbol in config.FUNCTIONS:
+            return self.symbol(self.left.absolute_error(variables), self.right.absolute_error(variables))
+        elif self.symbol in variables:
+            return variables[self.symbol]
         else:
-            return self.data
+            return self.symbol
 
-    def print_tree(self, term="", size=0, level=0):
-        print("%s%s" % (term, self.annotation()))
-        if self.left is not None:
-            self.left.print_tree(term + "   ", size)
-        if self.right is not None:
-            self.right.print_tree(term + "   ", size)
+    def print_tree(self, level=0):
+        printer.print_vertically(self)
 
     def init(self, min_depth, max_depth):
         """
@@ -60,30 +58,30 @@ class ParseTree:
 
         """
         if depth >= max_depth:
-            self.data = config.TERMINALS[randint(0, config.NUM_TERMINALS - 1)]
+            self.symbol = config.TERMINALS[randint(0, config.NUM_TERMINALS - 1)]
         else:
             if grow is True:
                 if random() < 0.5 or depth < config.MIN_DEPTH:
-                    self.data = config.FUNCTIONS[randint(0, config.NUM_FUNCTIONS - 1)]
+                    self.symbol = config.FUNCTIONS[randint(0, config.NUM_FUNCTIONS - 1)]
                 else:
-                    self.data = config.TERMINALS[randint(0, config.NUM_TERMINALS - 1)]
+                    self.symbol = config.TERMINALS[randint(0, config.NUM_TERMINALS - 1)]
             else:
-                self.data = config.FUNCTIONS[randint(0, config.NUM_FUNCTIONS - 1)]
+                self.symbol = config.FUNCTIONS[randint(0, config.NUM_FUNCTIONS - 1)]
 
-            if self.data in config.FUNCTIONS:
+            if self.symbol in config.FUNCTIONS:
                 self.left = ParseTree()
-                self.left.parent = self.data
+                self.left.parent = self.symbol
                 self.left.generate_random_tree(grow, max_depth, depth=depth + 1)
 
                 self.right = ParseTree()
-                self.right.parent = self.data
+                self.right.parent = self.symbol
                 self.right.generate_random_tree(grow, max_depth, depth=depth + 1)
 
     def size(self, left=0, right=0):
         """
 
         """
-        if self.data is None:
+        if self.symbol is None:
             return 0
 
         if self.left is not None:
@@ -109,3 +107,62 @@ class ParseTree:
 
         """
         mutation.subtree_mutation(self)
+
+    def level_order_search(self, node):
+        q = queue.Queue()
+        q.put((self, 0))
+
+        while not q.empty():
+            item = q.get()
+            subtree = item[0]
+            count = item[1]
+
+            if count == node:
+                return subtree
+
+            if subtree.left is not None:
+                count += 1
+                q.put((subtree.left, count))
+            if subtree.right is not None:
+                count += 1
+                q.put((subtree.right, count))
+
+    def subtree(self, node):
+        """
+
+        """
+        subtree = self.level_order_search(node)
+        subtree.parent=None
+        return subtree
+
+
+    def replace(self, replacement_tree, node):
+        subtree = self.level_order_search(node)
+        subtree.symbol = replacement_tree.symbol
+        subtree.left = replacement_tree.left
+        subtree.right = replacement_tree.right
+
+
+
+class GPNode:
+    """
+
+    """
+
+    def __init__(self, symbol=None, left=None, right=None, parent=None):
+        """
+
+        """
+        self.symbol = symbol
+        self.left = left
+        self.right = right
+        self.parent = parent
+
+    def get_symbol(self):
+        """
+
+        """
+        if self.symbol in config.FUNCTIONS:
+            return self.symbol.__name__
+        else:
+            return str(self.symbol)
