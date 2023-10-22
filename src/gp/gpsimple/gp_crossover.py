@@ -12,7 +12,7 @@ def subtree_crossover(tree1, tree2):
     subtree1 = tree1.subtree(crossover_point1)
     subtree2 = tree2.subtree(crossover_point2)
 
-    tree1.replace(subtree2, crossover_point1)
-    tree2.replace(subtree1, crossover_point2)
+    tree1.replace_subtree(subtree2, crossover_point1)
+    tree2.replace_subtree(subtree1, crossover_point2)
 
     return tree1, tree2

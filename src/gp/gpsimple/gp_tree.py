@@ -1,11 +1,11 @@
 import gp_config as config
 import gp_mutation as mutation
-import util.tree_print as printer
+import gp_print as printer
 from random import random, randint
 import queue
 
 
-class ParseTree:
+class GPNode:
     """
 
     """
@@ -28,14 +28,15 @@ class ParseTree:
         else:
             return str(self.symbol)
 
-    def evaluate(self, variables):
+    def evaluate(self, data):
         """
 
         """
         if self.symbol in config.FUNCTIONS:
-            return self.symbol(self.left.absolute_error(variables), self.right.absolute_error(variables))
-        elif self.symbol in variables:
-            return variables[self.symbol]
+            return self.symbol(self.left.evaluate(data), self.right.evaluate(data))
+        elif self.symbol in config.VARIABLES:
+            index = config.VARIABLES.index(self.symbol)
+            return data[index]
         else:
             return self.symbol
 
@@ -69,11 +70,11 @@ class ParseTree:
                 self.symbol = config.FUNCTIONS[randint(0, config.NUM_FUNCTIONS - 1)]
 
             if self.symbol in config.FUNCTIONS:
-                self.left = ParseTree()
+                self.left = GPNode()
                 self.left.parent = self.symbol
                 self.left.generate_random_tree(grow, max_depth, depth=depth + 1)
 
-                self.right = ParseTree()
+                self.right = GPNode()
                 self.right.parent = self.symbol
                 self.right.generate_random_tree(grow, max_depth, depth=depth + 1)
 
@@ -136,33 +137,11 @@ class ParseTree:
         return subtree
 
 
-    def replace(self, replacement_tree, node):
+    def replace_subtree(self, replacement, node):
         subtree = self.level_order_search(node)
-        subtree.symbol = replacement_tree.symbol
-        subtree.left = replacement_tree.left
-        subtree.right = replacement_tree.right
+        subtree.symbol = replacement.symbol
+        subtree.left = replacement.left
+        subtree.right = replacement.right
 
-
-
-class GPNode:
-    """
-
-    """
-
-    def __init__(self, symbol=None, left=None, right=None, parent=None):
-        """
-
-        """
-        self.symbol = symbol
-        self.left = left
-        self.right = right
-        self.parent = parent
-
-    def get_symbol(self):
-        """
-
-        """
-        if self.symbol in config.FUNCTIONS:
-            return self.symbol.__name__
-        else:
-            return str(self.symbol)
+    def is_root(self):
+        return self.parent is None
