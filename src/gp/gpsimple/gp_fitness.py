@@ -1,6 +1,14 @@
-import math
+# Copyright (C) 2023 -
+# Roman Kalkreuth (Roman.Kalkreuth@lip6.fr)
+# Computer Lab of Paris 6, Sorbonne Université (Paris, France)
+
 import numpy as np
 from math import sqrt
+
+__author__ = 'Roman Kalkreuth'
+__copyright__ = 'Copyright (C) 2023, Roman Kalkreuth'
+__version__ = '1.0'
+__email__  = 'Roman.Kalkreuth@lip6.fr'
 
 def absolute_error(actual, prediction):
     """
@@ -22,11 +30,11 @@ def root_mean_squared_error(actual, prediction):
     """
     return sqrt(mean_squared_error(actual, prediction))
 
-def calculate_fitness(actual, prediction, method="abs"):
+def calculate_fitness(actual, prediction, metric="abs"):
     """
 
     """
-    match method:
+    match metric:
         case "abs":
             return absolute_error(actual, prediction)
         case "mse":

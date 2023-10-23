@@ -1,16 +1,24 @@
+# Copyright (C) 2023 -
+# Roman Kalkreuth (Roman.Kalkreuth@lip6.fr)
+# Computer Lab of Paris 6, Sorbonne Université (Paris, France)
+
 import gp_config as config
 import gp_mutation as mutation
 import gp_print as printer
 from random import random, randint
 import queue
 
+__author__ = 'Roman Kalkreuth'
+__copyright__ = 'Copyright (C) 2023, Roman Kalkreuth'
+__version__ = '1.0'
+__email__  = 'Roman.Kalkreuth@lip6.fr'
 
 class GPNode:
     """
 
     """
 
-    def __init__(self, data=None, left=None, right=None, parent=None):
+    def __init__(self, init_tree=False, data=None, left=None, right=None, parent=None):
         """
 
         """
@@ -18,6 +26,9 @@ class GPNode:
         self.left = left
         self.right = right
         self.parent = parent
+
+        if init_tree is not False:
+            self.init(config.MIN_TREE_DEPTH, config.MAX_TREE_DEPTH)
 
     def get_symbol(self):
         """
@@ -35,8 +46,11 @@ class GPNode:
         if self.symbol in config.FUNCTIONS:
             return self.symbol(self.left.evaluate(data), self.right.evaluate(data))
         elif self.symbol in config.VARIABLES:
-            index = config.VARIABLES.index(self.symbol)
-            return data[index]
+            if config.NUM_VARIABLES > 1:
+                index = config.VARIABLES.index(self.symbol)
+                return data[index]
+            else:
+                return data
         else:
             return self.symbol
 
@@ -62,7 +76,7 @@ class GPNode:
             self.symbol = config.TERMINALS[randint(0, config.NUM_TERMINALS - 1)]
         else:
             if grow is True:
-                if random() < 0.5 or depth < config.MIN_DEPTH:
+                if random() < 0.5 or depth < config.MIN_TREE_DEPTH:
                     self.symbol = config.FUNCTIONS[randint(0, config.NUM_FUNCTIONS - 1)]
                 else:
                     self.symbol = config.TERMINALS[randint(0, config.NUM_TERMINALS - 1)]

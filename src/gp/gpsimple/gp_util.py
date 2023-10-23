@@ -1,4 +1,14 @@
+# Copyright (C) 2023 -
+# Roman Kalkreuth (Roman.Kalkreuth@lip6.fr)
+# Computer Lab of Paris 6, Sorbonne Université (Paris, France)
+
 import gp_config as config
+
+__author__ = 'Roman Kalkreuth'
+__copyright__ = 'Copyright (C) 2023, Roman Kalkreuth'
+__version__ = '1.0'
+__email__  = 'Roman.Kalkreuth@lip6.fr'
+
 def get_variables_from_terminals(terminals):
     """
 

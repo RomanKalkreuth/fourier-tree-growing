@@ -7,5 +7,5 @@ def levenshtein_distance(tree1, tree2):
     expression2 = util.generate_expression(tree2)
     return distance(expression1,expression2)
 
-def tree_edit_distance(tree1, tree2):
+#def tree_edit_distance(tree1, tree2):
 
