@@ -1,4 +1,4 @@
-from src.benchmark import dataset_generator as dg, functions as fn
+from src.benchmark.symbolic_regression import functions as fn, dataset_generator as dg
 import matplotlib.pyplot as plt
 
 #reader = UCIMLReader()
