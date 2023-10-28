@@ -127,5 +127,5 @@ def transform_list_format(tree):
         temp = []
         for node in adj_nodes:
             temp.append(node_dict[node])
-        adj_list.append(temp)
+        adj_list.append(temp[::-1])
     return node_list, adj_list

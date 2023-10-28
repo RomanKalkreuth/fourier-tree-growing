@@ -1,7 +1,6 @@
 from Levenshtein import distance
-import edist
+import edist.ted as ted
 import src.gp.gpsimple.gp_util as util
-from apted import APTED, Config
 
 def levenshtein_distance(tree1, tree2):
     expression1 = util.generate_expression(tree1)
@@ -14,3 +13,7 @@ def tree_edit_distance(tree1, tree2):
 
     """
 
+    x_nodes, x_adj = util.transform_list_format(tree1)
+    y_nodes, y_adj = util.transform_list_format(tree2)
+
+    return ted.standard_ted(x_nodes, x_adj, y_nodes, y_adj)

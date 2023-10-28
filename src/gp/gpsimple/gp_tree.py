@@ -55,7 +55,7 @@ class GPNode:
             return self.symbol
 
     def print_tree(self, level=0):
-        printer.print_vertically(self)
+        printer.print_tree_vertically(self)
 
     def init(self, min_depth, max_depth):
         """
