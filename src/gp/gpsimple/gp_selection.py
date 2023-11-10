@@ -9,30 +9,19 @@ import gp_config as config
 __author__ = 'Roman Kalkreuth'
 __copyright__ = 'Copyright (C) 2023, Roman Kalkreuth'
 __version__ = '1.0'
-__email__  = 'Roman.Kalkreuth@lip6.fr'
+__email__ = 'Roman.Kalkreuth@lip6.fr'
 
-def deterministic_tournament_selection(population,k):
-    """
 
-    """
+def tournament_selection(population, k=2, minimizing_fitness=True):
     n = len(population)
     tournament = []
 
     for i in range(k):
-        rand_index = random.randint(0, n)
+        rand_index = random.randint(0, n-1)
         rand_ind = population[rand_index]
         tournament.append(rand_ind)
 
-    best_ind, best_fit_val = tournament[0]
-    best = ()
+    tournament.sort(key=lambda tup: tup[1], reverse=not minimizing_fitness)
 
-    for ind, fit_val in tournament:
-        if fitness.is_better(fit_val, best_fit_val, config.MINIMIZING_FITNESS):
-            best = (ind, fit_val)
-            best_fit_val = fit_val
-
-    return best
-
-
-
+    return tournament[0]
 

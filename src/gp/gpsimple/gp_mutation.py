@@ -10,13 +10,13 @@ __copyright__ = 'Copyright (C) 2023, Roman Kalkreuth'
 __version__ = '1.0'
 __email__  = 'Roman.Kalkreuth@lip6.fr'
 
-def subtree_mutation(tree):
+def subtree_mutation(tree, mutation_rate):
     """
 
     """
-    if random() < config.MUTATION_RATE:
-        tree.generate_random_tree(grow=True, max_depth=config.SUBTREE_DEPTH)
+    if random() < mutation_rate:
+        tree.random_tree(grow=True, max_depth=config.SUBTREE_DEPTH)
     elif tree.left:
-        tree.left.mutate()
+        tree.left.mutate(mutation_rate=mutation_rate)
     elif tree.right:
-        tree.right.mutate()
+        tree.right.mutate(mutation_rate=mutation_rate)

@@ -60,3 +60,12 @@ def is_ideal(fitness, ideal_fitness, minimizing_fitness=True):
         return fitness <= ideal_fitness
     else:
         return fitness >= ideal_fitness
+
+def best_fitness(individuals, minimizing_fitness="True"):
+    fitnesses = [i[1] for i in individuals]
+    fitnesses.sort()
+    if minimizing_fitness:
+        return fitnesses[0]
+    else:
+        return fitnesses(len(fitnesses) - 1)
+

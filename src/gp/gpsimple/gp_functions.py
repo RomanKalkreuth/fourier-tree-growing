@@ -10,7 +10,6 @@ __email__  = 'Roman.Kalkreuth@lip6.fr'
 def add(x, y):
     return x + y
 
-
 def sub(x, y):
     return x - y
 

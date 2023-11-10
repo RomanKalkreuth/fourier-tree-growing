@@ -9,18 +9,25 @@ __copyright__ = 'Copyright (C) 2023, Roman Kalkreuth'
 __version__ = '1.0'
 __email__  = 'Roman.Kalkreuth@lip6.fr'
 
-def subtree_crossover(tree1, tree2):
+from random import random
+
+def subtree_crossover(ptree1, ptree2, crossover_rate):
     """
 
     """
+    if random() < crossover_rate:
+        crossover_point1 = randint(1, ptree1.size() - 1)
+        crossover_point2 = randint(1, ptree2.size() - 1)
 
-    crossover_point1 = randint(0, tree1.size())
-    crossover_point2 = randint(0, tree2.size())
+        otree1 = ptree1.clone()
+        otree2 = ptree2.clone()
 
-    subtree1 = tree1.subtree(crossover_point1)
-    subtree2 = tree2.subtree(crossover_point2)
+        subtree1 = otree1.subtree(crossover_point1)
+        subtree2 = otree2.subtree(crossover_point2)
 
-    tree1.replace_subtree(subtree2, crossover_point1)
-    tree2.replace_subtree(subtree1, crossover_point2)
+        otree1.replace_subtree(subtree2, crossover_point1)
+        otree2.replace_subtree(subtree1, crossover_point2)
 
-    return tree1, tree2
+        return otree1, otree2
+    else:
+        return ptree1, ptree2

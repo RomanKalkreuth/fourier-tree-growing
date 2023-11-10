@@ -2,7 +2,7 @@
 # Roman Kalkreuth (Roman.Kalkreuth@lip6.fr)
 # Computer Lab of Paris 6, Sorbonne Université (Paris, France)
 
-import gp_config as config
+import gp_parameters as config
 import gp_mutation as mutation
 import gp_print as printer
 import gp_util as util
@@ -21,14 +21,14 @@ class GPNode:
     it also stores the references to the (left and right) child nodes and the parent node (if existing).
 
     A node where is parent node reference is None is the root. If the left and right references are None, the
-    node is a leaf.
+    node is a leaf. 
 
     The class provides the basic functionality that is commonly used for the evaluation and variation of
     parse tree's in genetic programming (e.g. random initialization,
     subtree selection and replacement, interpretation, ...)
     """
 
-    def __init__(self, init_tree: bool = False, symbol=None, left=None, right=None, parent=None):
+    def __init__(self, init_tree=False, symbol=None, left=None, right=None, parent=None):
         self.symbol = symbol
         self.left = left
         self.right = right
@@ -37,7 +37,7 @@ class GPNode:
         if init_tree is not False:
             self.init(config.MIN_INIT_TREE_DEPTH, config.MAX_INIT_TREE_DEPTH)
 
-    def init(self, min_depth: int, max_depth: int):
+    def init(self, min_depth, max_depth):
         """
         Ramped Half-n-Half (RHH) GP tree initialization method.
 
@@ -55,7 +55,7 @@ class GPNode:
         else:
             self.random_tree(grow=False, max_depth=depth, min_depth=min_depth, depth=0)
 
-    def random_tree(self, grow: bool, max_depth: int, min_depth: int, depth: int = 0):
+    def random_tree(self, grow: bool, max_depth: int, min_depth: int,depth: int = 0):
         """
         Recursively samples a random tree either with the GROW or with the FULL method.
 
@@ -122,6 +122,7 @@ class GPNode:
         else:
             return self.symbol
 
+
     def get_symbol(self) -> str:
         """
         Returns the name of the symbol.
@@ -133,7 +134,7 @@ class GPNode:
         else:
             return str(self.symbol)
 
-    def size(self, left: int = 0, right: int = 0) -> int:
+    def size(self, left=0, right=0):
         """
         Recursively determines the size of a tree which is defined as the number of nodes.
 
@@ -154,7 +155,7 @@ class GPNode:
 
         return 1 + left + right
 
-    def depth(self, left: int = 0, right: int = 0):
+    def depth(self, left=0, right=0):
         """
         Recursively determines the maximum depth of the tree's branches.
 
@@ -172,7 +173,7 @@ class GPNode:
 
         return max(left + 1, right + 1)
 
-    def mutate(self, mutation_rate: float):
+    def mutate(self, mutation_rate):
         """
         Mutates the tree with subtree mutation.
 
@@ -182,7 +183,7 @@ class GPNode:
         """
         mutation.subtree_mutation(self, mutation_rate)
 
-    def subtree_at(self, node_num: int):
+    def subtree_at(self, node_num):
         """
         Searches the subtree at a specified node number.
         The tree is traversed by using breadth first search (BFS).
@@ -209,7 +210,7 @@ class GPNode:
             if subtree.right is not None:
                 q.put(subtree.right)
 
-    def subtree(self, node_num: int):
+    def subtree(self, node_num):
         """
         Returns a clone of the subtree at a specified node number.
 
@@ -226,25 +227,22 @@ class GPNode:
 
         return subtree.clone()
 
-    def replace_subtree(self, replacement: object, node: int):
+    def replace_subtree(self, replacement, node):
         """
-        Replaces a given subtree at a specified node index.
 
-        :param replacement: subtree used as replacement
-        :type replacement GPNode
-        :param node: node index at which the subtree is placed
-        :type int
+        :param replacement:
+        :type replacement
+        :param node:
         """
         subtree = self.subtree_at(node)
         subtree.symbol = replacement.symbol
         subtree.left = replacement.left
         subtree.right = replacement.right
 
-    def is_root(self) -> bool:
+    def is_root(self):
         """
-        Returns if the current node is the root of the tree.
-        :return root status of node
-        :rtype bool
+
+        :return:
         """
         return self.parent is None
 

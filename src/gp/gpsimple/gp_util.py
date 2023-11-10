@@ -10,11 +10,7 @@ __copyright__ = 'Copyright (C) 2023, Roman Kalkreuth'
 __version__ = '1.0'
 __email__ = 'Roman.Kalkreuth@lip6.fr'
 
-
 def get_variables_from_terminals(terminals):
-    """
-
-    """
     variables = []
     for terminal in terminals:
         if type(terminal) == str:
@@ -22,20 +18,17 @@ def get_variables_from_terminals(terminals):
     return variables
 
 
-def generate_expression(tree, expression=""):
-    """
-
-    """
+def generate_symbolic_expression(tree, expression=""):
     symbol = tree.get_symbol()
     expression += symbol
 
     if tree.symbol in config.FUNCTIONS:
         expression += "("
         if tree.left is not None:
-            expression += generate_expression(tree.left)
+            expression += generate_symbolic_expression(tree.left)
         if tree.right is not None:
             expression += ", "
-            expression += generate_expression(tree.right)
+            expression += generate_symbolic_expression(tree.right)
         expression += ")"
 
     return expression
@@ -71,7 +64,7 @@ def pre_order_traversal(node, index=1, node_list=None):
     return node_list
 
 
-def generate_dfs_node_list(tree):
+def generate_node_list(tree):
     node_list = []
     node_stack = [tree]
     node_dict = {}
@@ -91,13 +84,11 @@ def generate_dfs_node_list(tree):
             node_stack.append(node.left)
         if node.right is not None:
             node_stack.append(node.right)
+
     return node_list, node_dict
 
 
 def generate_adjacency_dict(tree):
-    """
-
-    """
     queue = deque()
     queue.append(tree)
     adj_dict = {}
@@ -117,9 +108,9 @@ def generate_adjacency_dict(tree):
     return adj_dict
 
 
-def transform_list_format(tree):
+def convert_list_format(tree):
     adj_dict = generate_adjacency_dict(tree)
-    node_list, node_dict = generate_dfs_node_list(tree)
+    node_list, node_dict = generate_node_list(tree)
     adj_list = []
 
     for key in adj_dict.keys():
