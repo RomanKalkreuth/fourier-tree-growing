@@ -14,7 +14,7 @@ __version__ = '1.0'
 __email__  = 'Roman.Kalkreuth@lip6.fr'
 
 FUNCTIONS = [gpf.add, gpf.sub, gpf.mul, gpf.div]
-TERMINALS = ['x']
+TERMINALS = ['x',0,1]
 VARIABLES = util.get_variables_from_terminals(TERMINALS)
 
 MU = 1

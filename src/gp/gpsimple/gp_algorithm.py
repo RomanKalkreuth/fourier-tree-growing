@@ -37,7 +37,7 @@ def one_plus_lambda_ea(max_generations=10000000,
             offspring = parent
             offspring.mutate(mutation_rate)
 
-            prediction = problem.eval(offspring)
+            prediction = problem.evaluate(offspring)
             offspring_fitness = fitness.calculate_fitness(actual, prediction, metric=metric)
 
             num_evaluations += 1
@@ -126,7 +126,7 @@ def breed_offspring(tree1, tree2, crossover_rate, mutation_rate):
 def evaluate_individuals(individuals, problem, fitness_metric):
     actual = problem.y_train
     for index, individual in enumerate(individuals):
-        prediction = problem.eval(individual[0])
+        prediction = problem.evaluate(individual[0])
         fitness_val = fitness.calculate_fitness(actual, prediction, metric=fitness_metric)
         individuals[index] = (individual[0], fitness_val)
 

@@ -33,32 +33,7 @@ regression_problem = problem.RegressionProblem(X_train, y_train)
 # algorithm.one_plus_lambda(num_generations=config.MAX_GENERATIONS, lmbda=config.LAMBDA,
 #                          ideal_fitness=config.IDEAL_FITNESS, problem=regression_problem)
 
-#ea = algorithm.canonical_ea(max_generations=10000, population_size=100, mutation_rate=0.05,
-#                            crossover_rate=0.9, tournament_size=2, stopping_criteria=0.01,
-#                            problem=regression_problem, num_elites=2)
+ea = algorithm.canonical_ea(max_generations=10000, population_size=100, mutation_rate=0.05,
+                            crossover_rate=0.9, tournament_size=2, stopping_criteria=0.01,
+                            problem=regression_problem, num_elites=2)
 
-#algorithm.evolve(ea)
-
-tree1 = GPNode()
-tree1.init(config.MIN_INIT_TREE_DEPTH, config.MAX_INIT_TREE_DEPTH)
-
-#tree2 = GPNode()
-#tree2.init(config.MIN_INIT_TREE_DEPTH, config.MAX_INIT_TREE_DEPTH)
-
-tree1.print_tree()
-print()
-
-size = tree1.size()
-depth = tree1.depth()
-print(size)
-print(depth)
-
-node_list, adj_list = util.convert_list_format(tree1)
-
-print(node_list)
-print(adj_list)
-
-#tree2.print_tree()
-
-#ted = distance.tree_edit_distance(tree1, tree2)
-#print(ted)

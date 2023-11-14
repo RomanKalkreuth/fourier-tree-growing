@@ -15,7 +15,7 @@ def subtree_mutation(tree, mutation_rate):
 
     """
     if random() < mutation_rate:
-        tree.random_tree(grow=True, max_depth=config.SUBTREE_DEPTH)
+        tree.random_tree(grow=True, min_depth=1, max_depth=config.SUBTREE_DEPTH)
     elif tree.left:
         tree.left.mutate(mutation_rate=mutation_rate)
     elif tree.right:

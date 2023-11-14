@@ -7,7 +7,7 @@ def init_population(size, problem, fitness_metric):
     population = []
     for i in range(size):
         individual = GPNode(init_tree=True)
-        prediction = problem.eval(individual)
+        prediction = problem.evaluate(individual)
         fitness_val = fitness.calculate_fitness(actual, prediction, metric=fitness_metric)
         population.append((individual, fitness_val))
     return population
