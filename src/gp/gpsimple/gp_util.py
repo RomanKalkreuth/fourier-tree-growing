@@ -3,12 +3,15 @@
 # Computer Lab of Paris 6, Sorbonne Université (Paris, France)
 
 import gp_config as config
+import queue
 from collections import deque
+
 
 __author__ = 'Roman Kalkreuth'
 __copyright__ = 'Copyright (C) 2023, Roman Kalkreuth'
 __version__ = '1.0'
 __email__ = 'Roman.Kalkreuth@lip6.fr'
+
 
 def get_variables_from_terminals(terminals):
     variables = []
@@ -120,3 +123,49 @@ def convert_list_format(tree):
             temp.append(node_dict[node])
         adj_list.append(temp[::-1])
     return node_list, adj_list
+
+
+def validate_tree(tree, functions: list, terminals: list) -> int:
+    """
+    Cases of invalidity:
+        - a terminal node has edges
+        - a function node has no edges
+        - a function node has only one edge
+        - a node is referenced (seen) twice (cycle)
+    """
+
+    q = queue.Queue()
+    err = 0
+    visited = {}
+    q.put(tree)
+
+    while not q.empty():
+        node = q.get()
+
+        if node.symbol not in functions:
+            if node.symbol not in terminals:
+                err += 1
+
+        if node.symbol in functions:
+            if node.left is None:
+                err += 1
+            if node.right is None:
+                err += 1
+
+        if node.symbol in terminals:
+            if node.left is not None:
+                err += 1
+            if node.right is not None:
+                err += 1
+
+        if node in visited:
+            err += 1
+        else:
+            visited[node] = True
+
+        if node.left is not None:
+            q.put(node.left)
+        if node.right is not None:
+            q.put(node.right)
+
+    return err

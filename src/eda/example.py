@@ -1,6 +1,8 @@
 import sys
 sys.path.insert(0, '../gp/gpsimple')
 
+import copy
+
 from gp_tree import GPNode
 import gp_config as config
 import gp_problem as problem
@@ -79,18 +81,22 @@ tree_list = convert.tree_to_list(tree)
 # Print the tree as list
 print(tree_list)
 
-tree_list_str = []
+# Convert the list where symbols are strings
+tree_list_str = copy.copy(tree_list)
+convert.symbols_to_string(tree_list_str, config.FUNCTIONS)
 
-for symbol in tree_list:
-    if symbol in config.FUNCTIONS:
-        tree_list_str.append(symbol.__name__)
-    else:
-        tree_list_str.append(str(symbol))
-
-# Print the tree as list where symbols are strings
 print(tree_list_str)
 
-tree = convert.list_to_tree(tree_list,config.FUNCTIONS)
+convert.symbols_to_type(tree_list_str, config.FUNCTIONS, config.TERMINALS)
+#tree_list = tree_list_str
+#print(tree_list)
+
+print()
+
+structure_validation = convert.validate_structure(tree_list, config.FUNCTIONS)
+print("Structure validation: " + str(structure_validation))
+
+tree = convert.list_to_tree(tree_list, config.FUNCTIONS)
 
 print()
 print("Re-converted tree from list format:")

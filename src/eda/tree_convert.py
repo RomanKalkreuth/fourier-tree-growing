@@ -1,10 +1,12 @@
 import sys
-
 sys.path.insert(0, '../gp/gpsimple')
+
+import copy
 
 from gp_tree import GPNode
 from collections import deque
 from queue import Queue
+
 
 def convert_node_adj_list(tree):
     adj_dict = generate_adjacency_dict(tree)
@@ -65,14 +67,15 @@ def generate_adjacency_dict(tree):
 
 
 def tree_to_list(tree):
-    tree_list = []
+    symbols = []
     q = Queue()
     q.put(tree)
 
     while not q.empty():
         node = q.get()
         symbol = node.symbol
-        tree_list.append(symbol)
+
+        symbols.append(symbol)
 
         if node.left is not None:
             q.put(node.left)
@@ -80,11 +83,14 @@ def tree_to_list(tree):
         if node.right is not None:
             q.put(node.right)
 
-    return tree_list
+    return symbols
 
 
-def list_to_tree(tree_list, functions):
-    symbol = tree_list.pop(0)
+def list_to_tree(symbols, functions):
+    if not symbols:
+        return GPNode()
+
+    symbol = symbols.pop(0)
     root = GPNode(symbol=symbol)
 
     q = Queue()
@@ -95,23 +101,60 @@ def list_to_tree(tree_list, functions):
         symbol = node.symbol
 
         if symbol in functions:
-            symbol = tree_list.pop(0)
+            symbol = symbols.pop(0)
             node.left = GPNode(parent=node, symbol=symbol)
             q.put(node.left)
 
-            symbol = tree_list.pop(0)
+            symbol = symbols.pop(0)
             node.right = GPNode(parent=node, symbol=symbol)
             q.put(node.right)
     return root
 
-def validate_tree_list(tree_list, depth , functions):
-    """
-    Cases of invalidity:
-     - Terminal node has edges
-     - Function node has no edges
-     - Function node has only one edge
-     - Node is referenced (seen) twice (cycle)
+def symbols_to_string(symbols, functions):
+    size = len(symbols)
 
-    """
+    i = 0
+    while i < size:
+        if symbols[i] in functions:
+            symbols[i] = symbols[i].__name__
+        else:
+            symbols[i] = str(symbols[i])
+        i += 1
+
+def symbols_to_type(symbols, functions, terminals):
+    size = len(symbols)
+    func_map = {}
+    terminal_map = {}
+
+    for func in functions:
+        func_map[func.__name__]= func
+
+    for term in terminals:
+        terminal_map[str(term)] = term
+
+    i = 0
+    while i < size:
+        symbol = symbols[i]
+        if symbol in func_map:
+            symbols[i] = func_map[symbol]
+        else:
+            symbols[i] = terminal_map[symbol]
+        i += 1
 
 
+def validate_structure(symbols, functions):
+    q = Queue()
+
+    s = copy.copy(symbols)
+    q.put(s.pop(0))
+
+    while not q.empty():
+        symbol = q.get()
+
+        if symbol in functions:
+            for i in range (2):
+                if s:
+                    q.put(s.pop(0))
+                else:
+                    return False
+    return True

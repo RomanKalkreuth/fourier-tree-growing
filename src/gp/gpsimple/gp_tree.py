@@ -277,44 +277,6 @@ class GPNode:
 
         return tree_clone
 
-    def validate(self, functions: list, terminals: list) -> int:
-        """
-        Cases of invalidity:
-            - a terminal node has edges
-            - a function node has no edges
-            - a function node has only one edge
-            - a node is referenced (seen) twice (cycle)
-        """
-
-        q = queue.Queue()
-        q.put(self)
-        err = 0
-
-        while not q.empty():
-            subtree = q.get()
-
-            if subtree.symbol not in functions:
-                if subtree.symbol not in terminals:
-                    err += 1
-
-            if subtree.symbol in functions:
-                if subtree.left is None:
-                    err += 1
-                if subtree.right is None:
-                    err += 1
-
-            if subtree.symbol in terminals:
-                if subtree.left is not None:
-                    err += 1
-                if subtree.right is not None:
-                    err += 1
-
-            if subtree.left is not None:
-                q.put(subtree.left)
-            if subtree.right is not None:
-                q.put(subtree.right)
-
-        return err
 
     def print_tree(self):
         """
