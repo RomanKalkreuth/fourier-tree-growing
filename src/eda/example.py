@@ -79,6 +79,17 @@ tree_list = convert.tree_to_list(tree)
 # Print the tree as list
 print(tree_list)
 
+tree_list_str = []
+
+for symbol in tree_list:
+    if symbol in config.FUNCTIONS:
+        tree_list_str.append(symbol.__name__)
+    else:
+        tree_list_str.append(str(symbol))
+
+# Print the tree as list where symbols are strings
+print(tree_list_str)
+
 tree = convert.list_to_tree(tree_list,config.FUNCTIONS)
 
 print()

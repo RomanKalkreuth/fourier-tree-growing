@@ -69,7 +69,7 @@ def generate_node_list(tree):
     node_stack = [tree]
     node_dict = {}
     count = 0
-    while len(node_stack) > 0:
+    while node_stack:
         node = node_stack.pop()
         symbol = node.get_symbol()
         node_list.append(symbol)
@@ -93,7 +93,7 @@ def generate_adjacency_dict(tree):
     queue.append(tree)
     adj_dict = {}
 
-    while len(queue) > 0:
+    while queue:
         node = queue.pop()
 
         if node not in adj_dict:

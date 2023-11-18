@@ -37,7 +37,7 @@ class GPNode:
         if init_tree is not False:
             self.init(config.MIN_INIT_TREE_DEPTH, config.MAX_INIT_TREE_DEPTH)
 
-    def init(self, min_depth: int, max_depth: int):
+    def init(self, min_depth: int, max_depth: int, grow=True):
         """
         Ramped Half-n-Half (RHH) GP tree initialization method.
 
@@ -51,9 +51,9 @@ class GPNode:
         depth = randint(min_depth, max_depth)
 
         if random() < 0.5:
-            self.random_tree(grow=True, max_depth=depth, min_depth=min_depth, depth=0)
+            self.random_tree(grow=grow, max_depth=depth, min_depth=min_depth, depth=0)
         else:
-            self.random_tree(grow=False, max_depth=depth, min_depth=min_depth, depth=0)
+            self.random_tree(grow=grow, max_depth=depth, min_depth=min_depth, depth=0)
 
     def random_tree(self, grow: bool, max_depth: int, min_depth: int, depth: int = 0):
         """
@@ -63,6 +63,8 @@ class GPNode:
 
         In contrast, GROW allows the selection of nodes from the function and terminal set
         until the depth limit is reached.
+
+        TODO: Revise max depth check for non-full (grow) trees
 
         :param grow: determines whether grow is used
         :type grow: bool
@@ -84,11 +86,11 @@ class GPNode:
 
             if self.symbol in config.FUNCTIONS:
                 self.left = GPNode()
-                self.left.parent = self.symbol
+                self.left.parent = self
                 self.left.random_tree(grow, max_depth, min_depth, depth=depth + 1)
 
                 self.right = GPNode()
-                self.right.parent = self.symbol
+                self.right.parent = self
                 self.right.random_tree(grow, max_depth, min_depth, depth=depth + 1)
 
     def eval(self, data: object) -> object:
@@ -154,7 +156,7 @@ class GPNode:
 
         return 1 + left + right
 
-    def depth(self, left: int = 0, right: int = 0):
+    def height(self, left: int = 0, right: int = 0):
         """
         Recursively determines the maximum depth of the tree's branches.
 
@@ -166,13 +168,13 @@ class GPNode:
         :rtype: int
         """
         if self.left is not None:
-            left = self.left.depth()
+            left = self.left.height()
         if self.right is not None:
-            right = self.right.depth()
+            right = self.right.height()
 
         return max(left + 1, right + 1)
 
-    def mutate(self, mutation_rate: float):
+    def mutate(self, mutation_rate: float, subtree_depth: int = 6):
         """
         Mutates the tree with subtree mutation.
 
@@ -180,7 +182,7 @@ class GPNode:
                               and is passed on to the mutation operator
         :type mutation_rate float
         """
-        mutation.subtree_mutation(self, mutation_rate)
+        mutation.subtree_mutation(self, mutation_rate=mutation_rate, max_depth=subtree_depth)
 
     def subtree_at(self, node_num: int):
         """
@@ -248,7 +250,7 @@ class GPNode:
         """
         return self.parent is None
 
-    def clone(self, root=None, tree_clone=None):
+    def clone(self, root: object = None, tree_clone: object = None) -> object:
         """
         Clones the tree and returns it afterwards.
         The tree is traversed recursively.
@@ -267,13 +269,52 @@ class GPNode:
             root = self
 
         if root.left is not None:
-            tree_clone.left = GPNode(symbol=root.left.symbol)
+            tree_clone.left = GPNode(symbol=root.left.symbol, parent=root)
             self.clone(root=root.left, tree_clone=tree_clone.left)
         if root.right is not None:
-            tree_clone.right = GPNode(symbol=root.right.symbol)
+            tree_clone.right = GPNode(symbol=root.right.symbol, parent=root)
             self.clone(root=root.right, tree_clone=tree_clone.right)
 
         return tree_clone
+
+    def validate(self, functions: list, terminals: list) -> int:
+        """
+        Cases of invalidity:
+            - a terminal node has edges
+            - a function node has no edges
+            - a function node has only one edge
+            - a node is referenced (seen) twice (cycle)
+        """
+
+        q = queue.Queue()
+        q.put(self)
+        err = 0
+
+        while not q.empty():
+            subtree = q.get()
+
+            if subtree.symbol not in functions:
+                if subtree.symbol not in terminals:
+                    err += 1
+
+            if subtree.symbol in functions:
+                if subtree.left is None:
+                    err += 1
+                if subtree.right is None:
+                    err += 1
+
+            if subtree.symbol in terminals:
+                if subtree.left is not None:
+                    err += 1
+                if subtree.right is not None:
+                    err += 1
+
+            if subtree.left is not None:
+                q.put(subtree.left)
+            if subtree.right is not None:
+                q.put(subtree.right)
+
+        return err
 
     def print_tree(self):
         """

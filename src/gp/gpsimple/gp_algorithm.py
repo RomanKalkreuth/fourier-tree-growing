@@ -19,26 +19,35 @@ def one_plus_lambda_ea(max_generations=10000000,
                        mutation_rate=0.01,
                        stopping_criteria=0.01,
                        problem=None,
-                       metric="abs",
+                       fitness_metric="abs",
                        minimizing_fitness=True,
                        strict_selection=True,
                        silent=False,
                        parameters=None):
+
+    if parameters is not None:
+        max_generations = parameters['max_generations']
+        mutation_rate = parameters['mutation_rate']
+        stopping_criteria = parameters['stopping_criteria']
+        subtree_depth = parameters['subtree_depth']
+        fitness_metric = parameters['fitness_metric']
+        minimizing_fitness = parameters['minimizing_fitness']
+        silent = parameters['silent']
 
     parent = GPNode(init_tree=True)
     num_evaluations = 0
 
     prediction = problem.eval(parent)
     actual = problem.y_train
-    best_fitness = fitness.calculate_fitness(actual, prediction, metric=metric)
+    best_fitness = fitness.calculate_fitness(actual, prediction, metric=fitness_metric)
 
     for gen in range(max_generations):
         for i in range(lmbda):
             offspring = parent
-            offspring.mutate(mutation_rate)
+            offspring.mutate(rate=mutation_rate, subtree_depth=subtree_depth)
 
             prediction = problem.evaluate(offspring)
-            offspring_fitness = fitness.calculate_fitness(actual, prediction, metric=metric)
+            offspring_fitness = fitness.calculate_fitness(actual, prediction, metric=fitness_metric)
 
             num_evaluations += 1
             if not silent:
@@ -69,6 +78,18 @@ def canonical_ea(max_generations=100,
                  minimizing_fitness=True,
                  silent=False,
                  parameters=None):
+
+    if parameters is not None:
+        max_generations = parameters['max_generations']
+        population_size = parameters['population_size']
+        crossover_rate = parameters['crossover_rate']
+        mutation_rate = parameters['mutation_rate']
+        tournament_size = parameters['tournament_size']
+        stopping_criteria = parameters['stopping_criteria']
+        num_elites = parameters['num_elites']
+        fitness_metric = parameters['fitness_metric']
+        minimizing_fitness = parameters['minimizing_fitness']
+        silent = parameters['silent']
 
     population = init.init_population(population_size, problem, fitness_metric)
     num_offspring = population_size - num_elites
@@ -104,11 +125,17 @@ def canonical_ea(max_generations=100,
 
     return best_fitness, num_evaluations
 
-def evolve(algorithm, parameters, num_jobs=1):
+def evolve(algorithm, parameters, problem, num_jobs=1, silent=False, minimalistic_output = False):
     result = []
     for job in range(num_jobs):
-        best_fitness, num_evaluations = algorithm()
+        best_fitness, num_evaluations = algorithm(parameters=parameters, problem=problem)
         result.append((best_fitness, num_evaluations))
+        if not silent:
+            if not minimalistic_output:
+                print("Job #" + str(job) + " - Evaluations: " + str(num_evaluations) +
+                " - Best Fitness: " + str(best_fitness))
+            else:
+                print(str(num_evaluations) + ";" + str(best_fitness))
     return result
 
 

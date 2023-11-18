@@ -17,10 +17,11 @@ def init_parameters(algorithm):
 
     parameters['max_generations'] = config.MAX_GENERATIONS
     parameters['stopping_criteria'] = config.STOPPING_CRITERIA
-    parameters['metric'] = config.FITNESS_METRIC
+    parameters['fitness_metric'] = config.FITNESS_METRIC
     parameters['minimizing_fitness'] = config.MINIMIZING_FITNESS
     parameters['init_depth'] = (config.MIN_INIT_TREE_DEPTH, config.MAX_INIT_TREE_DEPTH)
     parameters['subtree_depth'] = config.SUBTREE_DEPTH
+    parameters['silent'] = config.SILENT
 
     parameters['functions'] = config.FUNCTIONS
     parameters['terminals'] = config.TERMINALS

@@ -5,8 +5,6 @@ sys.path.insert(0, '../gp/gpsimple')
 from gp_tree import GPNode
 from collections import deque
 from queue import Queue
-import copy
-
 
 def convert_node_adj_list(tree):
     adj_dict = generate_adjacency_dict(tree)
@@ -27,7 +25,7 @@ def generate_node_list(tree):
     node_stack = [tree]
     node_dict = {}
     count = 0
-    while len(node_stack) > 0:
+    while node_stack:
         node = node_stack.pop()
         symbol = node.get_symbol()
         node_list.append(symbol)
@@ -51,7 +49,7 @@ def generate_adjacency_dict(tree):
     queue.append(tree)
     adj_dict = {}
 
-    while len(queue) > 0:
+    while queue:
         node = queue.pop()
 
         if node not in adj_dict:
@@ -105,3 +103,15 @@ def list_to_tree(tree_list, functions):
             node.right = GPNode(parent=node, symbol=symbol)
             q.put(node.right)
     return root
+
+def validate_tree_list(tree_list, depth , functions):
+    """
+    Cases of invalidity:
+     - Terminal node has edges
+     - Function node has no edges
+     - Function node has only one edge
+     - Node is referenced (seen) twice (cycle)
+
+    """
+
+
