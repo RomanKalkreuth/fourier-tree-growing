@@ -48,12 +48,12 @@ class GPNode:
         :param max_depth: maximum depth of the tree to be constructed
         :type max_depth: int
         """
-        depth = randint(min_depth, max_depth)
+        rand_depth = randint(min_depth, max_depth)
 
         if random() < 0.5:
-            self.random_tree(grow=grow, max_depth=depth, min_depth=min_depth, depth=0)
+            self.random_tree(grow=grow, max_depth=rand_depth, min_depth=min_depth)
         else:
-            self.random_tree(grow=grow, max_depth=depth, min_depth=min_depth, depth=0)
+            self.random_tree(grow=False, max_depth=rand_depth, min_depth=min_depth)
 
     def random_tree(self, grow: bool, max_depth: int, min_depth: int, depth: int = 0):
         """
@@ -64,8 +64,6 @@ class GPNode:
         In contrast, GROW allows the selection of nodes from the function and terminal set
         until the depth limit is reached.
 
-        TODO: Revise max depth check for non-full (grow) trees
-
         :param grow: determines whether grow is used
         :type grow: bool
         :param max_depth: maximum depth of the tree
@@ -73,7 +71,7 @@ class GPNode:
         :param depth: current depth of the tree sample
         :type depth: int
         """
-        if depth >= max_depth:
+        if depth >= max_depth - 1:
             self.symbol = config.TERMINALS[randint(0, config.NUM_TERMINALS - 1)]
         else:
             if grow is True:

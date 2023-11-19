@@ -7,6 +7,7 @@ from gp_tree import GPNode
 import gp_config as config
 import gp_problem as problem
 import gp_fitness as fitness
+import gp_util as util
 import tree_convert as convert
 
 import src.benchmark.symbolic_regression.dataset_generator as generator
@@ -101,4 +102,9 @@ tree = convert.list_to_tree(tree_list, config.FUNCTIONS)
 print()
 print("Re-converted tree from list format:")
 tree.print_tree()
+
+print()
+
+err = util.validate_tree(tree, config.FUNCTIONS, config.TERMINALS)
+print("Error of the tree: " + str(err))
 

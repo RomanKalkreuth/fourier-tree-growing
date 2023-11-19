@@ -12,7 +12,6 @@ from gp_tree import GPNode
 import gp_problem as problem
 import gp_fitness as fitness
 import gp_mutation as mutation
-import tree_convert as convert
 
 import src.benchmark.symbolic_regression.dataset_generator as generator
 import src.benchmark.symbolic_regression.functions as benchmarks
@@ -25,7 +24,7 @@ MAX_INIT_TREE_DEPTH = 6
 SUBTREE_DEPTH = 2
 MAX_NODE_MUTATIONS = 32
 MUTATION_RATE = 0.05
-NUM_SAMPLES = 20000
+NUM_SAMPLES = 0
 STEP = 0.01
 N = int(1.0/STEP) + 1
 
@@ -76,9 +75,9 @@ fd_arr = np.array(fd)
 #cr = np.corrcoef(pd_arr, fd_arr)
 #print(cr)
 
-plot = px.scatter(x=pd_arr, y=fd_arr)
-plot.update_layout(yaxis_range=[0,1000])
-plot.show()
+#plot = px.scatter(x=pd_arr, y=fd_arr)
+#plot.update_layout(yaxis_range=[0,1000])
+#plot.show()
 
 #plt.hist(pd_arr, bins=15)
 #plt.xlim(0, 1000)
