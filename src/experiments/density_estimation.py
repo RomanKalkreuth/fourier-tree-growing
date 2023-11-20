@@ -26,13 +26,13 @@ random.seed()
 np.random.seed()
 
 MIN_INIT_TREE_DEPTH = 2
-MAX_INIT_TREE_DEPTH = 4
+MAX_INIT_TREE_DEPTH = 6
 SUBTREE_DEPTH = 4
 MUTATION_RATE = 0.1
 NUM_SAMPLES = 100000
 
 # Choose a simple symbolic regression benchmark
-benchmark = benchmarks.koza2
+benchmark = benchmarks.nguyen5
 
 # Generate the training dataset
 X_train = generator.random_samples_float(-1.0, 1.0, 20)
@@ -54,22 +54,13 @@ for i in range(NUM_SAMPLES):
 
 print(fitnesses)
 
-#plot = px.histogram(x=fitnesses)
-#plot.show()
-
-#plt.hist(fitnesses, bins="auto")
-#plt.xlim(0, 1000)
-#plt.show()
-
-X = fitnesses.reshape(-1, 1)
-kde = KernelDensity(kernel='gaussian', bandwidth=3).fit(X)
-s = np.linspace(0,10000)
-e = kde.score_samples(s.reshape(-1,1))
-plt.plot(s, e)
+X = fitnesses[:, np.newaxis]
+X_plot = np.linspace(0, 100, 1000)[:, np.newaxis]
+kde = KernelDensity(kernel='gaussian', bandwidth=0.75).fit(X)
+log_dens = kde.score_samples(X_plot)
+plt.plot(
+        X_plot[:, 0],
+        np.exp(log_dens)
+)
 plt.show()
-
-#kde = KernelDensity(kernel='gaussian', bandwidth=0.5).fit(fitnesses)
-#sns.kdeplot(data=fitnesses, shade=True, bw=0.5)
-#plt.xlim(0, 100000)
-#plt.show()
 

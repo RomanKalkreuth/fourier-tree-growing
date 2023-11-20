@@ -22,6 +22,24 @@ def koza3(x):
     """
     return x ** 6 - 2 * x ** 4 + x ** 2
 
+def nguyen4(x):
+    """
+    x^6 + x^5 + x^4 + x^3 + x^2 + x
+    """
+    return x ** 6 + x ** 5 + x ** 4 + x ** 3 + x ** 2 + x
+
+def nguyen5(x):
+    """
+    sin(x^2) cos(x) - 1
+    """
+    return math.sin(x**2) * math.cos(x) - 1
+
+def nguyen6(x):
+    """
+    sin(x) + sin(x + x^2 )
+    """
+    return math.sin(x) + math.sin(x+x**2)
+
 
 def nguyen7(x):
     """
