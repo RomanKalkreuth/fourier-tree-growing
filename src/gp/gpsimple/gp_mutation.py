@@ -7,13 +7,14 @@ from random import random
 __author__ = 'Roman Kalkreuth'
 __copyright__ = 'Copyright (C) 2023, Roman Kalkreuth'
 __version__ = '1.0'
-__email__  = 'Roman.Kalkreuth@lip6.fr'
+__email__ = 'Roman.Kalkreuth@lip6.fr'
 
 import random
 import queue
 import gp_config as config
 
-def subtree_mutation(tree: object, mutation_rate: int, max_depth: int = 6):
+
+def subtree_mutation(tree: object, mutation_rate: float, max_depth: int = 6):
     """
     Standard subtree mutation operator which is commonly used in GP.
 
@@ -28,14 +29,14 @@ def subtree_mutation(tree: object, mutation_rate: int, max_depth: int = 6):
         subtree_mutation(tree=tree.right, mutation_rate=mutation_rate, max_depth=max_depth)
 
 
-def node_mutation(tree:object, n: int):
-
+def node_mutation(tree: object, n: int):
     size = tree.size()
     if size < n:
         n = size
 
     for i in range(n):
         single_node_mutation(tree)
+
 
 def single_node_mutation(tree: object):
     num_nodes = tree.size()
@@ -68,6 +69,7 @@ def single_node_mutation(tree: object):
             q.put(node.left)
         if node.right is not None:
             q.put(node.right)
+
 
 def random_symbol(symbols):
     return symbols[random.randint(0, len(symbols) - 1)]

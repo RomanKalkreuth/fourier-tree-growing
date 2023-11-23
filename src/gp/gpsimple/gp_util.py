@@ -6,7 +6,6 @@ import gp_config as config
 import queue
 from collections import deque
 
-
 __author__ = 'Roman Kalkreuth'
 __copyright__ = 'Copyright (C) 2023, Roman Kalkreuth'
 __version__ = '1.0'

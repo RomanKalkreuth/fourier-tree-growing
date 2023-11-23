@@ -1,11 +1,13 @@
 # Copyright (C) 2023 -
 # Roman Kalkreuth (Roman.Kalkreuth@lip6.fr)
 # Computer Lab of Paris 6, Sorbonne Université (Paris, France)
+import numpy as np
 
 import gp_config as config
 import gp_mutation as mutation
 import gp_print as printer
 import gp_util as util
+from gp_simple import GPSimple
 from random import random, randint
 import queue
 
@@ -28,16 +30,13 @@ class GPNode:
     subtree selection and replacement, interpretation, ...)
     """
 
-    def __init__(self, init_tree: bool = False, symbol=None, left=None, right=None, parent=None):
+    def __init__(self, symbol=None, left=None, right=None, parent=None):
         self.symbol = symbol
         self.left = left
         self.right = right
         self.parent = parent
 
-        if init_tree is not False:
-            self.init(config.MIN_INIT_TREE_DEPTH, config.MAX_INIT_TREE_DEPTH)
-
-    def init(self, min_depth: int, max_depth: int, grow=True):
+    def init_tree(self, min_depth: int, max_depth: int, grow=True):
         """
         Ramped Half-n-Half (RHH) GP tree initialization method.
 
@@ -55,7 +54,7 @@ class GPNode:
         else:
             self.random_tree(grow=False, max_depth=rand_depth, min_depth=min_depth)
 
-    def random_tree(self, grow: bool, max_depth: int, min_depth: int, depth: int = 0):
+    def random_tree(self, grow: bool, min_depth: int, max_depth: int, depth: int = 0):
         """
         Recursively samples a random tree either with the GROW or with the FULL method.
 
@@ -64,25 +63,28 @@ class GPNode:
         In contrast, GROW allows the selection of nodes from the function and terminal set
         until the depth limit is reached.
 
+
         :param grow: determines whether grow is used
         :type grow: bool
+        :param min_depth: minimum depth of the tree
+        :type min_depth: int
         :param max_depth: maximum depth of the tree
         :type max_depth: int
         :param depth: current depth of the tree sample
         :type depth: int
         """
         if depth >= max_depth - 1:
-            self.symbol = config.TERMINALS[randint(0, config.NUM_TERMINALS - 1)]
+            self.symbol = GPSimple.config.terminals[randint(0, GPSimple.config.num_terminals - 1)]
         else:
             if grow is True:
                 if random() < 0.5 or depth < min_depth:
-                    self.symbol = config.FUNCTIONS[randint(0, config.NUM_FUNCTIONS - 1)]
+                    self.symbol = GPSimple.config.functions[randint(0, GPSimple.config.num_functions - 1)]
                 else:
-                    self.symbol = config.TERMINALS[randint(0, config.NUM_TERMINALS - 1)]
+                    self.symbol = GPSimple.config.terminals[randint(0, GPSimple.config.num_terminals - 1)]
             else:
-                self.symbol = config.FUNCTIONS[randint(0, config.NUM_FUNCTIONS - 1)]
+                self.symbol = GPSimple.config.functions[randint(0, GPSimple.config.num_functions - 1)]
 
-            if self.symbol in config.FUNCTIONS:
+            if self.symbol in GPSimple.config.functions:
                 self.left = GPNode()
                 self.left.parent = self
                 self.left.random_tree(grow, max_depth, min_depth, depth=depth + 1)
@@ -91,7 +93,7 @@ class GPNode:
                 self.right.parent = self
                 self.right.random_tree(grow, max_depth, min_depth, depth=depth + 1)
 
-    def eval(self, data: object) -> object:
+    def eval(self, input: np.array) -> object:
         """
         Provides a simple GP parse tree interpreter.
 
@@ -106,19 +108,23 @@ class GPNode:
         - symbol is a constant:
             The value of the constant is returned from the terminal set.
 
-        :param data: data batch that contains the values of the used variables
-        :type data: list or np.array
+        :param input: data batch that contains the values of the used variables
+        :type input: list or np.array
 
         :return: result of the function call, value of the respective variable or constant
         """
-        if self.symbol in config.FUNCTIONS:
-            return self.symbol(self.left.eval(data), self.right.eval(data))
-        elif self.symbol in config.VARIABLES:
-            if config.NUM_VARIABLES > 1:
-                index = config.VARIABLES.index(self.symbol)
-                return data[index]
+        if self.symbol in GPSimple.config.functions:
+            arity = GPSimple.config.function_class.arity(self.symbol)
+            if arity == 1:
+                return self.symbol(self.left.eval(input))
             else:
-                return data
+                return self.symbol(self.left.eval(input), self.right.eval(input))
+        elif self.symbol in GPSimple.config.variables:
+            if GPSimple.config.num_variables > 1:
+                input_index = GPSimple.config.variables.index(self.symbol)
+                return input[input_index]
+            else:
+                return input
         else:
             return self.symbol
 
@@ -274,7 +280,6 @@ class GPNode:
             self.clone(root=root.right, tree_clone=tree_clone.right)
 
         return tree_clone
-
 
     def print_tree(self):
         """

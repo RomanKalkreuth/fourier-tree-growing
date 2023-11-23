@@ -10,7 +10,6 @@ def levenshtein_distance(tree1, tree2):
 
 
 def tree_edit_distance(tree1, tree2):
-
     x_nodes, x_adj = util.convert_list_format(tree1)
     y_nodes, y_adj = util.convert_list_format(tree2)
 

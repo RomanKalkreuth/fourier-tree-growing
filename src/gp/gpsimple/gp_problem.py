@@ -5,21 +5,21 @@
 __author__ = 'Roman Kalkreuth'
 __copyright__ = 'Copyright (C) 2023, Roman Kalkreuth'
 __version__ = '1.0'
-__email__  = 'Roman.Kalkreuth@lip6.fr'
+__email__ = 'Roman.Kalkreuth@lip6.fr'
 
 from abc import ABC, abstractmethod
 import numpy as np
-class GPProblem(ABC):
-    """
 
-    """
+
+class GPProblem(ABC):
     @abstractmethod
     def evaluate(self, tree):
         pass
 
+
 class RegressionProblem(GPProblem):
 
-    def __init__(self, X_train,  y_train, X_test=None, y_test=None):
+    def __init__(self, X_train, y_train, X_test=None, y_test=None):
         self.X_train = X_train
         self.y_train = y_train
 

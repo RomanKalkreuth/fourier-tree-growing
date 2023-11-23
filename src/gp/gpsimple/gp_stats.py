@@ -1,8 +1,8 @@
 import csv
 import time
 
-def write_results_to_csv(results, file_name=None, dir_path=None):
 
+def write_results_to_csv(results, file_name=None, dir_path=None):
     if file_name is None:
         file_name = "experiment_" + str(time.time()) + ".csv"
     if dir_path is None:

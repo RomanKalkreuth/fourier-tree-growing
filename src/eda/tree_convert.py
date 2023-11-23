@@ -1,4 +1,5 @@
 import sys
+
 sys.path.insert(0, '../gp/gpsimple')
 
 import copy
@@ -110,6 +111,7 @@ def list_to_tree(symbols, functions):
             q.put(node.right)
     return root
 
+
 def symbols_to_string(symbols, functions):
     size = len(symbols)
 
@@ -121,13 +123,14 @@ def symbols_to_string(symbols, functions):
             symbols[i] = str(symbols[i])
         i += 1
 
+
 def symbols_to_type(symbols, functions, terminals):
     size = len(symbols)
     func_map = {}
     terminal_map = {}
 
     for func in functions:
-        func_map[func.__name__]= func
+        func_map[func.__name__] = func
 
     for term in terminals:
         terminal_map[str(term)] = term
@@ -152,7 +155,7 @@ def validate_structure(symbols, functions):
         symbol = q.get()
 
         if symbol in functions:
-            for i in range (2):
+            for i in range(2):
                 if s:
                     q.put(s.pop(0))
                 else:

@@ -1,17 +1,21 @@
 import sys
+
 sys.path.insert(0, '../gp/gpsimple')
 
 import copy
 
+from gp_simple import GPSimple
 from gp_tree import GPNode
 import gp_config as config
 import gp_problem as problem
 import gp_fitness as fitness
 import gp_util as util
+
 import tree_convert as convert
 
 import src.benchmark.symbolic_regression.dataset_generator as generator
-import src.benchmark.symbolic_regression.functions as benchmarks
+import src.benchmark.symbolic_regression.benchmark_functions as benchmarks
+
 
 # Define constants for the minimum and maximum tree depth
 MIN_INIT_TREE_DEPTH = 2
@@ -39,17 +43,6 @@ print("Terminal set:")
 print(config.TERMINALS)
 print()
 
-
-# Instantiate and initialize a random GP parse tree from the function and terminal set
-tree = GPNode()
-tree.init(min_depth=MIN_INIT_TREE_DEPTH, max_depth=MAX_INIT_TREE_DEPTH)
-
-
-# Print the tree vertically
-print("Random parse tree:")
-tree.print_tree()
-print()
-
 # Choose a simple symbolic regression benchmark
 benchmark = benchmarks.koza1
 
@@ -60,11 +53,25 @@ y_train = generator.generate_function_values(benchmark, X_train)
 # Set up the GP regression problem with the training set
 regression_problem = problem.RegressionProblem(X_train, y_train)
 
+# Init the GPSimple system with our regression problem but without an algorithm
+GPSimple.init(problem=regression_problem, algorithm=None)
+
+# Instantiate and initialize a random GP parse tree from the function and terminal set
+tree = GPNode()
+tree.init_tree(min_depth=MIN_INIT_TREE_DEPTH, max_depth=MAX_INIT_TREE_DEPTH)
+
 # Predict the function values with our randomly generate tree
 prediction = regression_problem.evaluate(tree)
 
 # Store the real function values
 actual = regression_problem.y_train
+
+
+# Print the tree vertically
+print("Random parse tree:")
+tree.print_tree()
+print()
+
 
 # Calculate the fitness which is defined by the absolute distance between predicted and
 # actual values
@@ -72,7 +79,6 @@ fitness_val = fitness.calculate_fitness(actual, prediction, metric="abs")
 
 print("Fitness value (distance to optimum):")
 print(fitness_val)
-
 
 print()
 # Convert the tree to a list
@@ -89,8 +95,8 @@ convert.symbols_to_string(tree_list_str, config.FUNCTIONS)
 print(tree_list_str)
 
 convert.symbols_to_type(tree_list_str, config.FUNCTIONS, config.TERMINALS)
-#tree_list = tree_list_str
-#print(tree_list)
+# tree_list = tree_list_str
+# print(tree_list)
 
 print()
 
@@ -107,4 +113,3 @@ print()
 
 err = util.validate_tree(tree, config.FUNCTIONS, config.TERMINALS)
 print("Error of the tree: " + str(err))
-

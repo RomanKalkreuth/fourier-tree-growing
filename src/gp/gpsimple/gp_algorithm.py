@@ -5,7 +5,6 @@
 import gp_fitness as fitness
 import gp_selection as selection
 import gp_crossover as crossover
-import gp_init as init
 from gp_tree import GPNode
 
 __author__ = 'Roman Kalkreuth'
@@ -16,6 +15,8 @@ __email__ = 'Roman.Kalkreuth@lip6.fr'
 
 def one_plus_lambda_ea(max_generations=10000000,
                        lmbda=1,
+                       tree_init_depth=(2,6),
+                       subtree_depth=3,
                        mutation_rate=0.01,
                        stopping_criteria=0.01,
                        problem=None,
@@ -23,28 +24,27 @@ def one_plus_lambda_ea(max_generations=10000000,
                        minimizing_fitness=True,
                        strict_selection=True,
                        silent=False,
-                       parameters=None):
+                       hyperparameters=None):
 
-    if parameters is not None:
-        max_generations = parameters['max_generations']
-        mutation_rate = parameters['mutation_rate']
-        stopping_criteria = parameters['stopping_criteria']
-        subtree_depth = parameters['subtree_depth']
-        fitness_metric = parameters['fitness_metric']
-        minimizing_fitness = parameters['minimizing_fitness']
-        silent = parameters['silent']
+    if hyperparameters is not None:
+        max_generations = hyperparameters['max_generations']
+        mutation_rate = hyperparameters['mutation_rate']
+        tree_init_depth = hyperparameters['tree_init_depth']
+        subtree_depth = hyperparameters['subtree_depth']
+        stopping_criteria = hyperparameters['stopping_criteria']
 
-    parent = GPNode(init_tree=True)
+    parent = GPNode()
+    parent.init_tree(min_depth=tree_init_depth[0], max_depth=tree_init_depth[1])
     num_evaluations = 0
 
-    prediction = problem.eval(parent)
+    prediction = problem.evaluate(parent)
     actual = problem.y_train
     best_fitness = fitness.calculate_fitness(actual, prediction, metric=fitness_metric)
 
     for gen in range(max_generations):
         for i in range(lmbda):
             offspring = parent
-            offspring.mutate(rate=mutation_rate, subtree_depth=subtree_depth)
+            offspring.mutate(mutation_rate=mutation_rate, subtree_depth=subtree_depth)
 
             prediction = problem.evaluate(offspring)
             offspring_fitness = fitness.calculate_fitness(actual, prediction, metric=fitness_metric)
@@ -68,6 +68,8 @@ def one_plus_lambda_ea(max_generations=10000000,
 
 def canonical_ea(max_generations=100,
                  population_size=500,
+                 init_tree_depth=(2,6),
+                 subtree_depth=3,
                  crossover_rate=0.9,
                  mutation_rate=0.01,
                  tournament_size=7,
@@ -77,21 +79,19 @@ def canonical_ea(max_generations=100,
                  fitness_metric="abs",
                  minimizing_fitness=True,
                  silent=False,
-                 parameters=None):
+                 hyperparameters=None):
+    if hyperparameters is not None:
+        max_generations = hyperparameters['max_generations']
+        population_size = hyperparameters['population_size']
+        tree_init_depth = hyperparameters['tree_init_depth']
+        subtree_depth = hyperparameters['subtree_depth']
+        crossover_rate = hyperparameters['crossover_rate']
+        mutation_rate = hyperparameters['mutation_rate']
+        tournament_size = hyperparameters['tournament_size']
+        stopping_criteria = hyperparameters['stopping_criteria']
+        num_elites = hyperparameters['num_elites']
 
-    if parameters is not None:
-        max_generations = parameters['max_generations']
-        population_size = parameters['population_size']
-        crossover_rate = parameters['crossover_rate']
-        mutation_rate = parameters['mutation_rate']
-        tournament_size = parameters['tournament_size']
-        stopping_criteria = parameters['stopping_criteria']
-        num_elites = parameters['num_elites']
-        fitness_metric = parameters['fitness_metric']
-        minimizing_fitness = parameters['minimizing_fitness']
-        silent = parameters['silent']
-
-    population = init.init_population(population_size, problem, fitness_metric)
+    population = init_population(population_size, problem, fitness_metric)
     num_offspring = population_size - num_elites
     num_evaluations = 0
 
@@ -125,18 +125,6 @@ def canonical_ea(max_generations=100,
 
     return best_fitness, num_evaluations
 
-def evolve(algorithm, parameters, problem, num_jobs=1, silent=False, minimalistic_output = False):
-    result = []
-    for job in range(num_jobs):
-        best_fitness, num_evaluations = algorithm(parameters=parameters, problem=problem)
-        result.append((best_fitness, num_evaluations))
-        if not silent:
-            if not minimalistic_output:
-                print("Job #" + str(job) + " - Evaluations: " + str(num_evaluations) +
-                " - Best Fitness: " + str(best_fitness))
-            else:
-                print(str(num_evaluations) + ";" + str(best_fitness))
-    return result
 
 
 def sort_individuals(population, minimizing_fitness=True):
@@ -157,6 +145,13 @@ def evaluate_individuals(individuals, problem, fitness_metric):
         fitness_val = fitness.calculate_fitness(actual, prediction, metric=fitness_metric)
         individuals[index] = (individual[0], fitness_val)
 
-
-
-
+def init_population(population_size, tree_init_depth, problem, fitness_metric):
+    actual = problem.y_train
+    population = []
+    for i in range(population_size):
+        individual = GPNode()
+        individual.init_tree(min_depth=tree_init_depth[0], max_depth=tree_init_depth[1])
+        prediction = problem.evaluate(individual)
+        fitness_val = fitness.calculate_fitness(actual, prediction, metric=fitness_metric)
+        population.append((individual, fitness_val))
+    return population

@@ -2,43 +2,45 @@ import math
 import numpy as np
 
 
-def random_samples_float(min, max, n):
-    """
-
-    """
+def random_samples_float(min, max, n, dim=1):
     assert min < max
-    return (max - min) * np.random.random_sample(n) + min
+    samples = []
 
+    for i in range(0, dim):
+        sample = (max - min) * np.random.random_sample(n) + min
+        samples.append(sample)
 
-def random_samples_int(min, max, n):
-    """
+    return np.stack(samples, axis=1)
 
-    """
+def random_samples_int(min, max, n, dim=1):
     assert min < max
-    return np.random.randint(min, max, n)
+    samples = []
+
+    for i in range(0, dim):
+        sample = np.random.randint(min, max, n)
+        samples.append(sample)
+
+    return np.stack(samples, axis=1)
 
 
 def evenly_spaced_grid(start, stop, step):
-    """
-
-    """
     n = math.floor((abs(start) + abs(stop)) / step)
     return np.linspace(start, stop, n)
 
-def generate_function_values(function, data_points):
-    """
 
-    """
+def generate_function_values(function, data_points: np.array) -> np.array:
     num_instances = len(data_points)
     function_values = np.empty(num_instances)
+    dim = data_points.shape[0]
 
-    for index, data_points in enumerate(data_points):
-        function_values[index] = function(data_points)
+    for i, dp in enumerate(data_points):
+        if dim == 1:
+            function_values[i] = function(dp[0])
+        else:
+            function_values[i] = function(dp)
 
     return function_values
 
-def concatenate_data(data_points, function_values):
-    """
 
-    """
-    return np.stack((data_points, function_values), axis=1)
+def stack_data(arr1, arr2):
+    return np.column_stack((arr1, arr2))

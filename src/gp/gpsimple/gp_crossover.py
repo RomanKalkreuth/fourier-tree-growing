@@ -7,14 +7,12 @@ from random import random, randint
 __author__ = 'Roman Kalkreuth'
 __copyright__ = 'Copyright (C) 2023, Roman Kalkreuth'
 __version__ = '1.0'
-__email__  = 'Roman.Kalkreuth@lip6.fr'
+__email__ = 'Roman.Kalkreuth@lip6.fr'
 
 from random import random
 
-def subtree_crossover(ptree1, ptree2, crossover_rate):
-    """
 
-    """
+def subtree_crossover(ptree1, ptree2, crossover_rate):
     if random() < crossover_rate:
         crossover_point1 = randint(1, ptree1.size() - 1)
         crossover_point2 = randint(1, ptree2.size() - 1)

@@ -5,17 +5,15 @@
 __author__ = 'Roman Kalkreuth'
 __copyright__ = 'Copyright (C) 2023, Roman Kalkreuth'
 __version__ = '1.0'
-__email__  = 'Roman.Kalkreuth@lip6.fr'
+__email__ = 'Roman.Kalkreuth@lip6.fr'
 
 ELBOW = "└──"
 PIPE = "│  "
 TEE = "├──"
 BLANK = "   "
 
-def print_tree_vertically(tree, term="", left=False, right=False):
-    """
 
-    """
+def print_tree_vertically(tree, term="", left=False, right=False):
 
     if tree.get_symbol is None:
         return
@@ -33,6 +31,7 @@ def print_tree_vertically(tree, term="", left=False, right=False):
         print_tree_vertically(tree.left, term + (PIPE if left else BLANK), left=True, right=False)
     if tree.right is not None:
         print_tree_vertically(tree.right, term + (PIPE if left else BLANK), left=False, right=True)
+
 
 def print_population(population):
     for index, (ind, fitness) in enumerate(population):

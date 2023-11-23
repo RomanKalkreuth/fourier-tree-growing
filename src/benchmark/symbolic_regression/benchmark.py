@@ -4,19 +4,8 @@ from sklearn.model_selection import train_test_split
 
 
 class Benchmark:
-    """
-
-    """
 
     def __init__(self, data, name, num_instances, num_features):
-        """
-
-        :param name:
-        :param data:
-        :param num_instances:
-        :param num_features:
-        """
-
         self.outputs = None
         self.inputs = None
         self.num_inputs = None
@@ -29,25 +18,14 @@ class Benchmark:
         self.num_features = num_features
 
     def init_inputs(self, num_inputs, data):
-        """
-
-        :return:
-        """
         self.num_inputs = num_inputs
         self.inputs = np.array(data)
 
     def init_outputs(self, num_outputs, data):
-        """
-
-        :return:
-        """
         self.num_outputs = num_outputs
         self.outputs = np.array(data)
 
     def split_data(self, test_size):
-        """
-
-        """
         X_train, X_test, y_train, y_test = train_test_split(self.inputs, self.outputs,
                                                             test_size=test_size, random_state=42)
 

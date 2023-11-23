@@ -4,22 +4,8 @@ import pandas as pd
 
 
 class UCIMLReader:
-    """
-
-    """
-
-    def __init__(self):
-        """
-
-        """
 
     def read_from_repo(self, repo_id):
-        """
-        :param repo_id
-
-        :return benchmark
-        """
-
         dataset = fetch_ucirepo(repo_id)
         name = dataset.metadata.name
         num_instances = dataset.metadata.num_instances
@@ -30,18 +16,6 @@ class UCIMLReader:
         return benchmark
 
     def read_from_file(self, file_path, name, num_inputs=None, num_outputs=None, separator=',', omit_header=None):
-        """
-
-        :param file_path:
-        :param name
-        :param num_inputs:
-        :param num_outputs:
-        :param separator
-        :param omit_header
-
-        :return:
-        """
-
         data = pd.read_csv(file_path, sep=separator)
 
         num_instances = data.shape[0]
