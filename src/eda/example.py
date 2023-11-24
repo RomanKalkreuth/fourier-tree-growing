@@ -19,7 +19,7 @@ import src.benchmark.symbolic_regression.benchmark_functions as benchmarks
 
 # Define constants for the minimum and maximum tree depth
 MIN_INIT_TREE_DEPTH = 2
-MAX_INIT_TREE_DEPTH = 3
+MAX_INIT_TREE_DEPTH = 4
 
 # The function set is stored in the gp_config.py file. It contains the functions which
 # are called during evaluation
@@ -44,11 +44,11 @@ print(config.TERMINALS)
 print()
 
 # Choose a simple symbolic regression benchmark
-benchmark = benchmarks.koza1
+objective_function = benchmarks.nguyen9
 
 # Generate the training dataset
-X_train = generator.random_samples_float(-1.0, 1.0, 20)
-y_train = generator.generate_function_values(benchmark, X_train)
+X_train = generator.random_samples_float(-1.0, 1.0, 20, dim=2)
+y_train = generator.generate_function_values(objective_function, X_train)
 
 # Set up the GP regression problem with the training set
 regression_problem = problem.RegressionProblem(X_train, y_train)

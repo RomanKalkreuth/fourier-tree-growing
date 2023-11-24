@@ -22,15 +22,19 @@ def print_tree_vertically(tree, term="", left=False, right=False):
 
     if right or tree.parent is None:
         prefix += ELBOW
+    elif left and tree.parent.right is None:
+        prefix += ELBOW
     elif left:
         prefix += TEE
 
     print("%s%s%s" % (term, prefix, tree.get_symbol()))
 
+    appendix = (PIPE if left and tree.parent.right is not None else BLANK)
+
     if tree.left is not None:
-        print_tree_vertically(tree.left, term + (PIPE if left else BLANK), left=True, right=False)
+        print_tree_vertically(tree.left, term + appendix, left=True, right=False)
     if tree.right is not None:
-        print_tree_vertically(tree.right, term + (PIPE if left else BLANK), left=False, right=True)
+        print_tree_vertically(tree.right, term + appendix, left=False, right=True)
 
 
 def print_population(population):

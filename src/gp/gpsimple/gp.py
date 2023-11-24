@@ -1,6 +1,7 @@
 from gp_problem import RegressionProblem
 import gp_algorithm
 from gp_simple import GPSimple
+from gp_tree import GPNode
 
 import src.benchmark.symbolic_regression.dataset_generator as generator
 import src.benchmark.symbolic_regression.benchmark_functions as functions
@@ -13,5 +14,12 @@ regression_problem = RegressionProblem(X_train, y_train)
 ea = gp_algorithm.one_plus_lambda_ea
 
 GPSimple.init(regression_problem, ea)
-GPSimple.run()
+#GPSimple.run()
+
+tree = GPNode()
+tree.init_tree(2,6)
+
+tree.print_tree()
+
+print(tree.eval(input=X_train[0]))
 

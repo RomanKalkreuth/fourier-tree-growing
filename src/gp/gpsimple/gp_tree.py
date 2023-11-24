@@ -50,9 +50,9 @@ class GPNode:
         rand_depth = randint(min_depth, max_depth)
 
         if random() < 0.5:
-            self.random_tree(grow=grow, max_depth=rand_depth, min_depth=min_depth)
+            self.random_tree(grow=grow, min_depth=min_depth, max_depth=rand_depth)
         else:
-            self.random_tree(grow=False, max_depth=rand_depth, min_depth=min_depth)
+            self.random_tree(grow=False, min_depth=min_depth, max_depth=rand_depth)
 
     def random_tree(self, grow: bool, min_depth: int, max_depth: int, depth: int = 0):
         """
@@ -85,13 +85,20 @@ class GPNode:
                 self.symbol = GPSimple.config.functions[randint(0, GPSimple.config.num_functions - 1)]
 
             if self.symbol in GPSimple.config.functions:
+
+                arity = GPSimple.config.function_class.arity(self.symbol)
+
                 self.left = GPNode()
                 self.left.parent = self
-                self.left.random_tree(grow, max_depth, min_depth, depth=depth + 1)
+                self.left.random_tree(grow, min_depth, max_depth, depth=depth + 1)
 
-                self.right = GPNode()
-                self.right.parent = self
-                self.right.random_tree(grow, max_depth, min_depth, depth=depth + 1)
+                if arity > 1:
+                    self.right = GPNode()
+                    self.right.parent = self
+                    self.right.random_tree(grow, min_depth, max_depth, depth=depth + 1)
+                else:
+                    self.right = None
+
 
     def eval(self, input: np.array) -> object:
         """

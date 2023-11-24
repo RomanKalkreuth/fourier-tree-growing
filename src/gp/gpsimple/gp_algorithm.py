@@ -27,7 +27,7 @@ def one_plus_lambda_ea(max_generations=10000000,
                        hyperparameters=None):
 
     if hyperparameters is not None:
-        max_generations = hyperparameters['max_generations']
+        lmbda = hyperparameters['lambda']
         mutation_rate = hyperparameters['mutation_rate']
         tree_init_depth = hyperparameters['tree_init_depth']
         subtree_depth = hyperparameters['subtree_depth']
@@ -68,7 +68,7 @@ def one_plus_lambda_ea(max_generations=10000000,
 
 def canonical_ea(max_generations=100,
                  population_size=500,
-                 init_tree_depth=(2,6),
+                 tree_init_depth=(2,6),
                  subtree_depth=3,
                  crossover_rate=0.9,
                  mutation_rate=0.01,
@@ -91,7 +91,7 @@ def canonical_ea(max_generations=100,
         stopping_criteria = hyperparameters['stopping_criteria']
         num_elites = hyperparameters['num_elites']
 
-    population = init_population(population_size, problem, fitness_metric)
+    population = init_population(population_size, tree_init_depth, problem, fitness_metric)
     num_offspring = population_size - num_elites
     num_evaluations = 0
 
@@ -114,7 +114,7 @@ def canonical_ea(max_generations=100,
             parent2 = selection.tournament_selection(population, tournament_size)
 
             ptree1, ptree2 = parent1[0], parent2[0]
-            otree = breed_offspring(ptree1, ptree2, crossover_rate, mutation_rate)
+            otree = breed_offspring(ptree1, ptree2, crossover_rate, mutation_rate, subtree_depth)
 
             offspring.append((otree, None))
 
@@ -126,15 +126,14 @@ def canonical_ea(max_generations=100,
     return best_fitness, num_evaluations
 
 
-
 def sort_individuals(population, minimizing_fitness=True):
     population.sort(key=lambda tup: tup[1], reverse=not minimizing_fitness)
     return population
 
 
-def breed_offspring(tree1, tree2, crossover_rate, mutation_rate):
+def breed_offspring(tree1, tree2, crossover_rate, mutation_rate, subtree_depth):
     otree1, otree2 = crossover.subtree_crossover(tree1, tree2, crossover_rate=crossover_rate)
-    otree1.mutate(mutation_rate=mutation_rate)
+    otree1.mutate(mutation_rate=mutation_rate, subtree_depth=subtree_depth)
     return otree1
 
 

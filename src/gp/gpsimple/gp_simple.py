@@ -5,7 +5,6 @@
 import random
 import numpy as np
 
-from dataclasses import dataclass
 from typing import Callable
 
 from gp_problem import GPProblem
@@ -47,19 +46,29 @@ class GPSimple:
 
     @staticmethod
     def evolve(algorithm, hyperparameters, problem, num_jobs=1,
-           silent=False, minimalistic_output=False, config=None):
+               silent_evolver=False, minimalistic_output=False, config=None):
 
         result = []
 
         if config is not None:
-            silent = config.silent
+            silent_algorithm = config.silent_algorithm
+            silent_evolver = config.silent_evolver
             num_jobs = config.num_jobs
+            max_generations = config.max_generations
             minimalistic_output = config.minimalistic_output
+            stopping_criteria = config.stopping_criteria
+            minimizing_fitness = config.minimizing_fitness
 
         for job in range(num_jobs):
-            best_fitness, num_evaluations = algorithm(hyperparameters=hyperparameters, problem=problem)
+            best_fitness, num_evaluations = algorithm(max_generations=max_generations,
+                                                      problem=problem,
+                                                      silent=silent_algorithm,
+                                                      minimalistic_output=minimalistic_output,
+                                                      minimizing_fitness=minimizing_fitness,
+                                                      stopping_criteria=stopping_criteria,
+                                                      hyperparameters=hyperparameters)
             result.append((best_fitness, num_evaluations))
-            if not silent:
+            if not silent_evolver:
                 if not minimalistic_output:
                     print("Job #" + str(job) + " - Evaluations: " + str(num_evaluations) +
                       " - Best Fitness: " + str(best_fitness))

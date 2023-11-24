@@ -13,7 +13,7 @@ __version__ = '1.0'
 __email__ = 'Roman.Kalkreuth@lip6.fr'
 
 
-FUNCTIONS = [Mathematical.add, Mathematical.sub, Mathematical.mul, Mathematical.div]
+FUNCTIONS = [Mathematical.add, Mathematical.sub, Mathematical.mul, Mathematical.div, Mathematical.sin]
 TERMINALS = ['x', 'y']
 VARIABLES = util.get_variables_from_terminals(TERMINALS)
 
@@ -25,7 +25,8 @@ SUBTREE_DEPTH = 6
 
 MAX_GENERATIONS = 2000
 NUM_JOBS = 100
-SILENT = True
+SILENT_EVOLVER = False
+SILENT_ALGORITHM = False
 MINIMALISTIC_OUTPUT = False
 
 MINIMIZING_FITNESS = True
@@ -67,7 +68,8 @@ class GPConfig:
     stopping_criteria: float
     minimizing_fitness: bool
 
-    silent: bool
+    silent_algorithm: bool
+    silent_evolver:bool
     minimalistic_output:bool
 
     #def validate(self):
