@@ -39,6 +39,9 @@ def node_mutation(tree: object, n: int):
 
 
 def single_node_mutation(tree: object):
+    """
+    TODO: Change config access to GPSimple object  
+    """
     num_nodes = tree.size()
     rand_node = random.randint(0, num_nodes)
 
@@ -52,15 +55,20 @@ def single_node_mutation(tree: object):
 
         if count == rand_node:
             if node.symbol in config.FUNCTIONS:
-                symbols = config.FUNCTIONS
-            else:
-                symbols = config.TERMINALS
+                node_arity = config.FUNCTION_CLASS.arity(node.symbol)
 
-            rand_symbol = random_symbol(symbols)
-            while rand_symbol == node.symbol:
-                rand_symbol = random_symbol(symbols)
+                rand_symbol = random_symbol(config.FUNCTIONS)
+                rand_arity = config.FUNCTION_CLASS.arity(rand_symbol)
+
+                while rand_arity != node_arity:
+                    rand_symbol = random_symbol(config.FUNCTIONS)
+                    rand_arity = config.FUNCTION_CLASS.arity(rand_symbol)
+
+            else:
+                rand_symbol = random_symbol(config.TERMINALS)
 
             node.symbol = rand_symbol
+
             return
 
         count += 1

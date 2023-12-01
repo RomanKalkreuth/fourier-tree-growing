@@ -31,5 +31,5 @@ class RegressionProblem(GPProblem):
     def evaluate(self, tree):
         prediction = np.zeros(self.n)
         for index, X in enumerate(self.X_train):
-            prediction[index] = tree.eval(X)
+            prediction[index] = tree.evaluate(X)
         return prediction

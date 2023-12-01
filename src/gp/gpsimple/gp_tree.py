@@ -100,7 +100,7 @@ class GPNode:
                     self.right = None
 
 
-    def eval(self, input: np.array) -> object:
+    def evaluate(self, input: np.array) -> object:
         """
         Provides a simple GP parse tree interpreter.
 
@@ -123,9 +123,9 @@ class GPNode:
         if self.symbol in GPSimple.config.functions:
             arity = GPSimple.config.function_class.arity(self.symbol)
             if arity == 1:
-                return self.symbol(self.left.eval(input))
+                return self.symbol(self.left.evaluate(input))
             else:
-                return self.symbol(self.left.eval(input), self.right.eval(input))
+                return self.symbol(self.left.evaluate(input), self.right.evaluate(input))
         elif self.symbol in GPSimple.config.variables:
             if GPSimple.config.num_variables > 1:
                 input_index = GPSimple.config.variables.index(self.symbol)
