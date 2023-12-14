@@ -11,7 +11,7 @@ import gp_problem as problem
 import gp_fitness as fitness
 import gp_util as util
 
-import tree_convert as convert
+import src.conversion.tree_conversion as convert
 
 import src.benchmark.symbolic_regression.dataset_generator as generator
 import src.benchmark.symbolic_regression.benchmark_functions as benchmarks

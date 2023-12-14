@@ -1,4 +1,3 @@
-import config
 
 ELBOW = "└──"
 PIPE = "│  "
@@ -35,17 +34,17 @@ def print_tree_vertically(tree, term="", left=False, right=False):
     if tree.right is not None:
         print_tree_vertically(tree.right, term + appendix, left=False, right=True)
 
-def generate_symbolic_expression(tree, expression=""):
+def generate_symbolic_expression(tree, functions, expression=""):
     symbol = tree.get_symbol()
     expression += symbol
 
-    if tree.symbol in config.FUNCTIONS:
+    if tree.symbol in functions:
         expression += "("
         if tree.left is not None:
-            expression += generate_symbolic_expression(tree.left)
+            expression += generate_symbolic_expression(tree.left, functions)
         if tree.right is not None:
             expression += ", "
-            expression += generate_symbolic_expression(tree.right)
+            expression += generate_symbolic_expression(tree.right, functions)
         expression += ")"
 
     return expression

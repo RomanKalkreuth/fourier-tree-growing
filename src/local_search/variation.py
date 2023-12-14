@@ -7,7 +7,7 @@ def random_symbol(symbols):
 
 def single_node_variation(tree):
     num_nodes = tree.size()
-    rand_node = random.randint(0, num_nodes)
+    rand_node = random.randint(0, num_nodes - 1)
 
     q = queue.Queue()
     q.put(tree)
@@ -19,21 +19,20 @@ def single_node_variation(tree):
 
         if count == rand_node:
             if node.symbol in config.FUNCTIONS:
-                node_arity = config.FUNCTION_CLASS.arity(node.symbol)
+                symbol_arity = config.FUNCTION_CLASS.arity(node.symbol)
 
                 rand_symbol = random_symbol(config.FUNCTIONS)
                 rand_arity = config.FUNCTION_CLASS.arity(rand_symbol)
 
-                while rand_arity != node_arity:
+                while not rand_arity == symbol_arity:
                     rand_symbol = random_symbol(config.FUNCTIONS)
                     rand_arity = config.FUNCTION_CLASS.arity(rand_symbol)
-
             else:
                 rand_symbol = random_symbol(config.TERMINALS)
 
+            transition = (node.symbol, rand_symbol)
             node.symbol = rand_symbol
-
-            return
+            return transition
 
         count += 1
 

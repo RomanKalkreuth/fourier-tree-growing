@@ -1,6 +1,4 @@
-import sys
-sys.path.insert(0, '../gp/gpsimple')
-from gp_tree import GPNode
+from src.representation.parse_tree import ParseTree
 from collections import deque
 from queue import Queue
 
@@ -86,10 +84,10 @@ def tree_to_list(tree):
 
 def list_to_tree(symbols, functions):
     if not symbols:
-        return GPNode()
+        return ParseTree()
 
     symbol = symbols.pop(0)
-    root = GPNode(symbol=symbol)
+    root = ParseTree(symbol=symbol)
 
     q = Queue()
     q.put(root)
@@ -100,11 +98,11 @@ def list_to_tree(symbols, functions):
 
         if symbol in functions:
             symbol = symbols.pop(0)
-            node.left = GPNode(parent=node, symbol=symbol)
+            node.left = ParseTree(parent=node, symbol=symbol)
             q.put(node.left)
 
             symbol = symbols.pop(0)
-            node.right = GPNode(parent=node, symbol=symbol)
+            node.right = ParseTree(parent=node, symbol=symbol)
             q.put(node.right)
     return root
 

@@ -167,7 +167,7 @@ class GPNode:
 
         return 1 + left + right
 
-    def height(self, left: int = 0, right: int = 0):
+    def depth(self, left: int = 0, right: int = 0):
         """
         Recursively determines the maximum depth of the tree's branches.
 
@@ -179,9 +179,9 @@ class GPNode:
         :rtype: int
         """
         if self.left is not None:
-            left = self.left.height()
+            left = self.left.depth()
         if self.right is not None:
-            right = self.right.height()
+            right = self.right.depth()
 
         return max(left + 1, right + 1)
 

@@ -11,8 +11,7 @@ __email__ = 'Roman.Kalkreuth@lip6.fr'
 
 import random
 import queue
-import gp_config as config
-
+from gp_simple import GPSimple
 
 def subtree_mutation(tree: object, mutation_rate: float, max_depth: int = 6):
     """
@@ -39,11 +38,8 @@ def node_mutation(tree: object, n: int):
 
 
 def single_node_mutation(tree: object):
-    """
-    TODO: Change config access to GPSimple object  
-    """
     num_nodes = tree.size()
-    rand_node = random.randint(0, num_nodes)
+    rand_node = random.randint(0, num_nodes - 1)
 
     q = queue.Queue()
     q.put(tree)
@@ -54,22 +50,21 @@ def single_node_mutation(tree: object):
         node = q.get()
 
         if count == rand_node:
-            if node.symbol in config.FUNCTIONS:
-                node_arity = config.FUNCTION_CLASS.arity(node.symbol)
+            if node.symbol in GPSimple.config.functions:
+                symbol_arity = GPSimple.config.function_class.arity(node.symbol)
 
-                rand_symbol = random_symbol(config.FUNCTIONS)
-                rand_arity = config.FUNCTION_CLASS.arity(rand_symbol)
+                rand_symbol = random_symbol(GPSimple.config.functions)
+                rand_arity = GPSimple.config.function_class.arity(rand_symbol)
 
-                while rand_arity != node_arity:
-                    rand_symbol = random_symbol(config.FUNCTIONS)
-                    rand_arity = config.FUNCTION_CLASS.arity(rand_symbol)
-
+                while not rand_arity == symbol_arity:
+                    rand_symbol = random_symbol(GPSimple.config.functions)
+                    rand_arity = GPSimple.config.function_class.arity(rand_symbol)
             else:
-                rand_symbol = random_symbol(config.TERMINALS)
+                rand_symbol = random_symbol(GPSimple.config.terminals)
 
+            transition = (node.symbol, rand_symbol)
             node.symbol = rand_symbol
-
-            return
+            return transition
 
         count += 1
 
