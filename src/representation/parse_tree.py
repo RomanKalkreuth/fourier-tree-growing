@@ -3,8 +3,7 @@ import numpy as np
 import src.util as util
 from src.functions.functions import Mathematical
 
-FUNCTIONS = [Mathematical.add, Mathematical.sub, Mathematical.mul, Mathematical.div, Mathematical.sin,
-             Mathematical.cos, Mathematical.log, Mathematical.sqrt]
+FUNCTIONS = [Mathematical.add, Mathematical.sub, Mathematical.mul, Mathematical.div]
 TERMINALS = ['x', 1.0]
 VARIABLES = [terminal for terminal in TERMINALS if type(terminal) == str]
 
@@ -12,6 +11,8 @@ FUNCTION_CLASS = Mathematical
 
 MIN_INIT_TREE_DEPTH = 2
 MAX_INIT_TREE_DEPTH = 4
+
+GROW = True
 
 NUM_FUNCTIONS = len(FUNCTIONS)
 NUM_TERMINALS = len(TERMINALS)
@@ -24,6 +25,8 @@ class ParseTree:
         self.left = left
         self.right = right
         self.parent = parent
+
+        #self.init_tree(min_depth=MIN_INIT_TREE_DEPTH, max_depth=MAX_INIT_TREE_DEPTH, grow=GROW)
 
 
     def init_tree(self, min_depth: int, max_depth: int, grow=True):
@@ -101,6 +104,31 @@ class ParseTree:
             return self.symbol.__name__
         else:
             return str(self.symbol)
+        
+    def variate(self, mutation_rate: float, subtree: object = None, max_depth: int = 6):
+        if subtree is None:
+            subtree = self
+        if random() < mutation_rate:
+            subtree.random_tree(grow=True, min_depth=1, max_depth=max_depth)
+        elif self.left is not None:
+            self.variate(subtree=subtree.left, mutation_rate=mutation_rate)
+        elif self.right is not None:
+            self.variate(subtree=subtree.right, mutation_rate=mutation_rate)
+
+    def clone(self, root: object = None, tree_clone: object = None) -> object:
+        if tree_clone is None:
+            tree_clone = ParseTree(symbol=self.symbol)
+        if root is None:
+            root = self
+
+        if root.left is not None:
+            tree_clone.left = ParseTree(symbol=root.left.symbol, parent=root)
+            self.clone(root=root.left, tree_clone=tree_clone.left)
+        if root.right is not None:
+            tree_clone.right = ParseTree(symbol=root.right.symbol, parent=root)
+            self.clone(root=root.right, tree_clone=tree_clone.right)
+
+        return tree_clone
 
     def __str__(self):
         return util.generate_symbolic_expression(self, FUNCTIONS)
