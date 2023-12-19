@@ -38,36 +38,40 @@ for instance in range(0, INSTANCES):
     parent = ParseTree()
     parent.init_tree(min_depth=MIN_INIT_TREE_DEPTH, max_depth=MAX_INIT_TREE_DEPTH)
     best, v1 = evaluation.evaluate(parent, X, y, f_eval)
+    seq1 = [float(parent.evaluate(x)) for x in X]
+    v1 = seq1
     count = 0
     for iter in range(0, ITERATIONS):
 
         loss_vecs.clear()
         candidates.clear()
 
-        loss_vecs.append(v1)
+        loss_vecs.append(v1[:])
 
         for i in range(0, LAMBDA):
             candidate = parent.clone()
             candidate.variate(mutation_rate=MUTATION_RATE)
 
             cost, loss_vec = evaluation.evaluate(candidate, X, y, f_eval)
+            seq = [float(candidate.evaluate(x)) for x in X]
+            loss_vec = seq
 
-            candidates.append((candidate, cost, loss_vec))
-            loss_vecs.append(loss_vec)
+            candidates.append((candidate, cost, loss_vec[:]))
+            loss_vecs.append(loss_vec[:])
 
         candidates = sorted(candidates, key=itemgetter(1))
         best_cost_gen = candidates[0][1]
         best_cand = candidates[0][0]
 
         if evaluation.is_better(best_cost_gen, best, minimizing=True, strict=True):
+            linear_dependent = analysis.linear_dependency([v1, candidates[0][2]])
+            if not linear_dependent:
+                print(f'generation {iter} liner dependency with parent:', linear_dependent, file=sys.stderr)
             best = best_cost_gen
             parent = best_cand
             v1 = candidates[0][2]
-
-        linear_dependent = analysis.linear_dependency(loss_vecs)
-
-        if linear_dependent:
-            count += 1
+            if linear_dependent:
+                count += 1
 
     counts[instance] = count
 
