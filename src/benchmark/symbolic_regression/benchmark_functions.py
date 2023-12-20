@@ -1,10 +1,18 @@
 import math
 
+
+def polynomial(x, degree):
+    s = 0.0
+    for d in range(1, degree + 1):
+        s += x ** d
+    return s
+
+
 def koza1(x):
     """
     x^4 + x^3 + x^2 + x
     """
-    return x ** 4 + x ** 3 + x ** 2 + x
+    return polynomial(x, 4)
 
 
 def koza2(x):
@@ -21,11 +29,15 @@ def koza3(x):
     return x ** 6 - 2 * x ** 4 + x ** 2
 
 
+def nguyen3(x):
+    return polynomial(x, 5)
+
+
 def nguyen4(x):
     """
     x^6 + x^5 + x^4 + x^3 + x^2 + x
     """
-    return x ** 6 + x ** 5 + x ** 4 + x ** 3 + x ** 2 + x
+    return polynomial(x, 6)
 
 
 def nguyen5(x):
@@ -48,11 +60,13 @@ def nguyen7(x):
     """
     return math.log(x + 1) + math.log(x ** 2 + 1)
 
+
 def nguyen8(x):
     """
     sqrt(x)
     """
     return math.sqrt(x)
+
 
 def nguyen9(args):
     """

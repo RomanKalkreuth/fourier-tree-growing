@@ -41,6 +41,8 @@ def one_plus_lambda_ea(max_generations=10000000,
     actual = problem.y_train
     best_fitness = fitness.calculate_fitness(actual, prediction, metric=fitness_metric)
 
+
+    #TODO Fix bug related with the determination of the best offspring by using sorted
     for gen in range(max_generations):
         for i in range(lmbda):
             offspring = parent

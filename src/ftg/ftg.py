@@ -30,12 +30,12 @@ def toseq(x_bar, f):
 
 
 def inner_prod(x1, x2):
-    return np.dot(x1.vec, x2.vec)
+    return np.dot(x1.losses, x2.losses)
 
 
 def minus_fun(x1, x2):
     fun = Fun(None, None)
-    fun.vec = x1.vec - x2.vec
+    fun.vec = x1.losses - x2.losses
     return fun
 
 

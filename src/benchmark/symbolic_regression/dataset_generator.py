@@ -1,5 +1,6 @@
 import math
 import numpy as np
+from benchmark_functions import polynomial
 
 
 def random_samples_float(min, max, n, dim=1):
@@ -38,9 +39,17 @@ def generate_function_values(function, data_points: np.array) -> np.array:
             function_values[i] = function(dp[0])
         else:
             function_values[i] = function(dp)
-
     return function_values
 
+
+def generate_polynomial_values(data_points, degree):
+    num_instances = len(data_points)
+    function_values = np.empty(num_instances)
+
+    for i, dp in enumerate(data_points):
+        function_values[i] = polynomial(dp, degree)
+
+    return function_values
 
 def stack_data(arr1, arr2):
     return np.column_stack((arr1, arr2))

@@ -1,5 +1,6 @@
 from random import random, randint
 import numpy as np
+import queue
 import src.util as util
 from src.functions.functions import Mathematical
 
@@ -25,9 +26,6 @@ class ParseTree:
         self.left = left
         self.right = right
         self.parent = parent
-
-        #self.init_tree(min_depth=MIN_INIT_TREE_DEPTH, max_depth=MAX_INIT_TREE_DEPTH, grow=GROW)
-
 
     def init_tree(self, min_depth: int, max_depth: int, grow=True):
         rand_depth = randint(min_depth, max_depth)
@@ -104,6 +102,40 @@ class ParseTree:
             return self.symbol.__name__
         else:
             return str(self.symbol)
+
+    def subtree_at(self, node_num: int):
+        q = queue.Queue()
+        q.put(self)
+        count = 0
+
+        while not q.empty():
+            subtree = q.get()
+
+            if count == node_num:
+                return subtree
+
+            count += 1
+
+            if subtree.left is not None:
+                q.put(subtree.left)
+            if subtree.right is not None:
+                q.put(subtree.right)
+
+    def subtree(self, node_num: int):
+        subtree = self.subtree_at(node_num)
+
+        if subtree is None:
+            raise RuntimeError('Subtree not found')
+
+        subtree.parent = None
+
+        return subtree.clone()
+
+    def replace_subtree(self, replacement: object, node: int):
+        subtree = self.subtree_at(node)
+        subtree.symbol = replacement.symbol
+        subtree.left = replacement.left
+        subtree.right = replacement.right
         
     def variate(self, mutation_rate: float, subtree: object = None, max_depth: int = 6):
         if subtree is None:

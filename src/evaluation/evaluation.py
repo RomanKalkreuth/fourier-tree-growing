@@ -42,9 +42,8 @@ def evaluate(tree, X, y, f_eval):
     for i, x in enumerate(X):
         y_pred = tree.evaluate(x)
         loss = f_eval(y_pred, y[i])
-        loss_vec[i] = loss
         cost += loss
-    return cost, loss_vec
+    return cost
 
 
 def evaluate_sample(sample, X, y, f_eval):
