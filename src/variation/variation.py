@@ -12,7 +12,7 @@ def probabilistic_subtree_mutation(tree: object, mutation_rate: float, max_depth
 def uniform_subtree_mutation(tree: object, max_depth: int = 6):
     mutation_point = random.randint(1, tree.size() - 1)
     subtree = ParseTree()
-    subtree.init_tree(2, max_depth)
+    subtree.init_tree(1, max_depth)
     tree.replace_subtree(subtree, mutation_point)
 
 

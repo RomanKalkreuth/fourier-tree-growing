@@ -7,6 +7,9 @@ def polynomial(x, degree):
         s += x ** d
     return s
 
+def monomial(x, degree):
+    return x ** degree
+
 
 def koza1(x):
     """

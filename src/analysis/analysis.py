@@ -19,6 +19,20 @@ def polynomial_degree_fit(x, y, max_deg):
             return best_deg
     return best_deg
 
+def function_values(tree, min, max, n):
+
+    X = np.linspace(min, max, num=n)
+    y = np.zeros(n)
+
+    for index, x in enumerate(X):
+        inp = np.array(x)
+        y[index] = tree.evaluate(inp)
+
+    return X, y
+
+
+
+
 
 
 

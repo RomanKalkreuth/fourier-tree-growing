@@ -11,6 +11,7 @@ sys.path.insert(0,'../benchmark/symbolic_regression')
 from src.representation.parse_tree import ParseTree
 import src.evaluation.evaluation as evaluation
 import src.analysis.analysis as analysis
+import src.variation.variation as variation
 
 import src.benchmark.symbolic_regression.dataset_generator as generator
 import src.benchmark.symbolic_regression.benchmark_functions as functions
@@ -19,13 +20,15 @@ random.seed()
 
 MIN_INIT_TREE_DEPTH = 2
 MAX_INIT_TREE_DEPTH = 6
-ITERATIONS = 1000
+MAX_SUBTREE_DEPTH = 3
+IDEAL_COST = 10e-2
+GENERATIONS = 10000
 MUTATION_RATE = 0.1
-LAMBDA = 2
+LAMBDA = 8
 INSTANCES = 1
-MAX_DEG = 10
+MAX_DEG = 20
 
-objective_function = functions.nguyen4
+objective_function = functions.koza1
 X = generator.random_samples_float(-1.0, 1.0, 20, dim=1)
 y = generator.generate_polynomial_values(X, 8)
 f_eval = evaluation.absolute_error
@@ -40,12 +43,16 @@ depths = np.zeros(LAMBDA)
 for instance in range(0, INSTANCES):
     parent = ParseTree()
     parent.init_tree(min_depth=MIN_INIT_TREE_DEPTH, max_depth=MAX_INIT_TREE_DEPTH)
-    best = evaluation.evaluate(parent, X, y, f_eval)
-    seq1 = [float(parent.evaluate(x)) for x in X]
-    deg1 = analysis.polynomial_degree_fit(X.flatten(), seq1, MAX_DEG)
-
+    best_cost = evaluation.evaluate(parent, X, y, f_eval)
     count = 0
-    for iter in range(0, ITERATIONS):
+
+    for generation in range(0, GENERATIONS):
+
+        seq1 = [float(parent.evaluate(x)) for x in X]
+        #deg1 = analysis.polynomial_degree_fit(X.flatten(), seq1, MAX_DEG)
+        x_lin, y_lin = analysis.function_values(parent, -10, 10, 100)
+        deg1 = analysis.polynomial_degree_fit(x_lin, y_lin, MAX_DEG)
+        depth1 = parent.depth()
 
         sequences.clear()
         candidates.clear()
@@ -54,32 +61,48 @@ for instance in range(0, INSTANCES):
 
         for i in range(0, LAMBDA):
             candidate = parent.clone()
-            candidate.variate(mutation_rate=MUTATION_RATE)
+            #variation.probabilistic_subtree_mutation(tree=candidate, mutation_rate=MUTATION_RATE,
+            #                                         max_depth=SUBTREE_DEPTH)
+
+            variation.uniform_subtree_mutation(tree=candidate, max_depth=MAX_SUBTREE_DEPTH)
 
             cost = evaluation.evaluate(candidate, X, y, f_eval)
             seq = [float(candidate.evaluate(x)) for x in X]
-            deg = analysis.polynomial_degree_fit(X.flatten(), seq, MAX_DEG)
+
+            x_lin, y_lin = analysis.function_values(candidate, -10, 10, 100)
+            deg = analysis.polynomial_degree_fit(x_lin, y_lin, MAX_DEG)
+
+            #deg = analysis.polynomial_degree_fit(X.flatten(), seq, MAX_DEG)
 
             candidates.append((candidate, cost, seq[:], deg))
             sequences.append(seq[:])
 
         candidates = sorted(candidates, key=itemgetter(1))
         best_cost_gen = candidates[0][1]
-        best_cand = candidates[0][0]
+        best_candidate = candidates[0][0]
 
-
-        if evaluation.is_better(best_cost_gen, best, minimizing=True, strict=True):
+        if evaluation.is_better(best_cost_gen, best_cost, minimizing=True, strict=True):
             deg = candidates[0][3]
+            depth = best_candidate.depth()
+
             if deg1 != deg:
-                linear_dependent = False
+                linear_dependency = False
                 count += 1
             else:
-                linear_dependent = True
+                linear_dependency = True
 
-            print(f'generation {iter} liner dependency with parent:', linear_dependent, file=sys.stderr)
+            best_cost = best_cost_gen
+            parent = best_candidate
 
-            best = best_cost_gen
-            parent = best_cand
+            print(f'Generation {generation}, best cost: {best_cost}, linear dependency with parent: {linear_dependency}, polynomial degree of parent: {deg1}, '
+                  f'polynomial degree of offspring: {deg}, depth of parent: {depth1}, depth of offspring: {depth}', file=sys.stderr)
+
+            #print(f'Expression: {parent}', file=sys.stderr)
+
+            if evaluation.is_ideal(best_cost, ideal_cost=IDEAL_COST):
+                print(f'Ideal fitness reached in generation {generation}', file=sys.stderr)
+                print(f'Expression: {parent}', file=sys.stderr)
+                break
 
     counts[instance] = count
 

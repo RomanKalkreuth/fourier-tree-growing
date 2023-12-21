@@ -1,11 +1,12 @@
 from random import random, randint
 import numpy as np
 import queue
-import src.util as util
+import src.util.util as util
 from src.functions.functions import Mathematical
 
-FUNCTIONS = [Mathematical.add, Mathematical.sub, Mathematical.mul, Mathematical.div]
-TERMINALS = ['x', 1.0]
+#FUNCTIONS = [Mathematical.add, Mathematical.sub, Mathematical.mul, Mathematical.div]
+FUNCTIONS = [Mathematical.add, Mathematical.mul]
+TERMINALS = ['x']
 VARIABLES = [terminal for terminal in TERMINALS if type(terminal) == str]
 
 FUNCTION_CLASS = Mathematical
@@ -136,16 +137,6 @@ class ParseTree:
         subtree.symbol = replacement.symbol
         subtree.left = replacement.left
         subtree.right = replacement.right
-        
-    def variate(self, mutation_rate: float, subtree: object = None, max_depth: int = 6):
-        if subtree is None:
-            subtree = self
-        if random() < mutation_rate:
-            subtree.random_tree(grow=True, min_depth=1, max_depth=max_depth)
-        elif self.left is not None:
-            self.variate(subtree=subtree.left, mutation_rate=mutation_rate)
-        elif self.right is not None:
-            self.variate(subtree=subtree.right, mutation_rate=mutation_rate)
 
     def clone(self, root: object = None, tree_clone: object = None) -> object:
         if tree_clone is None:
