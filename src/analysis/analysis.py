@@ -34,9 +34,6 @@ def function_values(tree, min, max, n):
     return X, y
 
 
-
-
-
 def normalize_polynomial(tree):
     if not tree:
         return None, None

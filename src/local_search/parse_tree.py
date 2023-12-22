@@ -75,9 +75,9 @@ class ParseTree:
 
     def depth(self, left: int = 0, right: int = 0):
         if self.left is not None:
-            left = self.left.depth()
+            left = self.left.dep()
         if self.right is not None:
-            right = self.right.depth()
+            right = self.right.dep()
 
         return max(left + 1, right + 1)
 

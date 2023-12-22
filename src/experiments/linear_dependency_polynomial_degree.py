@@ -24,13 +24,13 @@ MAX_SUBTREE_DEPTH = 3
 IDEAL_COST = 10e-2
 GENERATIONS = 10000
 MUTATION_RATE = 0.1
-LAMBDA = 8
+LAMBDA = 1
 INSTANCES = 1
 MAX_DEG = 20
 
 objective_function = functions.koza1
 X = generator.random_samples_float(-1.0, 1.0, 20, dim=1)
-y = generator.generate_polynomial_values(X, 8)
+y = generator.generate_function_values(objective_function, X)
 f_eval = evaluation.absolute_error
 
 sequences = []
@@ -46,13 +46,14 @@ for instance in range(0, INSTANCES):
     best_cost = evaluation.evaluate(parent, X, y, f_eval)
     count = 0
 
-    for generation in range(0, GENERATIONS):
+    for gen in range(0, GENERATIONS):
 
         seq1 = [float(parent.evaluate(x)) for x in X]
-        #deg1 = analysis.polynomial_degree_fit(X.flatten(), seq1, MAX_DEG)
         x_lin, y_lin = analysis.function_values(parent, -10, 10, 100)
         deg1 = analysis.polynomial_degree_fit(x_lin, y_lin, MAX_DEG)
-        depth1 = parent.depth()
+        dep1 = parent.depth()
+        dgrs1, cnts1 = analysis.normalize_polynomial(parent)
+        norm1 = analysis.sorted_degrees_constants_to_str(dgrs1, cnts1)
 
         sequences.clear()
         candidates.clear()
@@ -61,8 +62,6 @@ for instance in range(0, INSTANCES):
 
         for i in range(0, LAMBDA):
             candidate = parent.clone()
-            #variation.probabilistic_subtree_mutation(tree=candidate, mutation_rate=MUTATION_RATE,
-            #                                         max_depth=SUBTREE_DEPTH)
 
             variation.uniform_subtree_mutation(tree=candidate, max_depth=MAX_SUBTREE_DEPTH)
 
@@ -72,7 +71,10 @@ for instance in range(0, INSTANCES):
             x_lin, y_lin = analysis.function_values(candidate, -10, 10, 100)
             deg = analysis.polynomial_degree_fit(x_lin, y_lin, MAX_DEG)
 
-            #deg = analysis.polynomial_degree_fit(X.flatten(), seq, MAX_DEG)
+            dgrs, cnts = analysis.normalize_polynomial(candidate)
+            norm = analysis.sorted_degrees_constants_to_str(dgrs, cnts)
+
+            print(f'Generation {gen}, Norm of parent: {norm1}, Norm of offspring: {norm}', file=sys.stderr)
 
             candidates.append((candidate, cost, seq[:], deg))
             sequences.append(seq[:])
@@ -83,7 +85,7 @@ for instance in range(0, INSTANCES):
 
         if evaluation.is_better(best_cost_gen, best_cost, minimizing=True, strict=True):
             deg = candidates[0][3]
-            depth = best_candidate.depth()
+            dep = best_candidate.depth()
 
             if deg1 != deg:
                 linear_dependency = False
@@ -94,13 +96,11 @@ for instance in range(0, INSTANCES):
             best_cost = best_cost_gen
             parent = best_candidate
 
-            print(f'Generation {generation}, best cost: {best_cost}, linear dependency with parent: {linear_dependency}, polynomial degree of parent: {deg1}, '
-                  f'polynomial degree of offspring: {deg}, depth of parent: {depth1}, depth of offspring: {depth}', file=sys.stderr)
-
-            #print(f'Expression: {parent}', file=sys.stderr)
+           # print(f'Generation {gen}, best cost: {best_cost}, linear dependency with parent: {linear_dependency}, polynomial degree of parent: {deg1}, '
+           #       f'polynomial degree of offspring: {deg}, depth of parent: {dep1}, depth of offspring: {dep}', file=sys.stderr)
 
             if evaluation.is_ideal(best_cost, ideal_cost=IDEAL_COST):
-                print(f'Ideal fitness reached in generation {generation}', file=sys.stderr)
+                print(f'Ideal fitness reached in generation {gen}', file=sys.stderr)
                 print(f'Expression: {parent}', file=sys.stderr)
                 break
 
