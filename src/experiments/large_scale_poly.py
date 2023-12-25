@@ -92,7 +92,7 @@ class Poly:
                 c = 0
             c += cs[i]
             prv_degree = ds[i]
-        degrees.append(prv_degree)
+        degrees.append(int(prv_degree))
         constants.append(c)
         self.ds = degrees
         self.cs = constants
