@@ -72,7 +72,7 @@ def normalize_polynomial(tree):
             it_right += 1
     elif tree.symbol == Mathematical.mul:
         ds = np.zeros(len(degrees_left) * len(degrees_right), dtype=int)
-        cs = np.zeros(len(degrees_left) * len(degrees_right), dtype=int)
+        cs = [0] * (len(degrees_left) * len(degrees_right))
         cnt = 0
         for i in range(len(degrees_left)):
             for j in range(len(degrees_right)):
@@ -84,28 +84,36 @@ def normalize_polynomial(tree):
         c = 0
         for i in sorted_ids:
             if prv_degree != ds[i]:
-                degrees.append(prv_degree)
+                degrees.append(int(prv_degree))
                 constants.append(c)
                 c = 0
             c += cs[i]
             prv_degree = ds[i]
-        degrees.append(prv_degree)
+        degrees.append(int(prv_degree))
         constants.append(c)
     else:
         raise ValueError(f'Symbol {tree.symbol} is not supported')
-    return np.array(degrees), np.array(constants)
+    return degrees, constants
 
 
-def sorted_degrees_constants_to_str(sorted_degrees, constants):
+def sorted_degrees_constants_to_str(sorted_degrees, constants, no_zero=False):
     a = []
+    started = False
     for i in range(len(sorted_degrees)):
-        if i > 0:
+        if started:
             s = f'{abs(constants[i])}*x^{sorted_degrees[i]}'
             if constants[i] < 0:
                 a.append(f' - {s}')
-            else:
+            elif constants[i] > 0:
                 a.append(f' + {s}')
+            else:
+                if not no_zero:
+                    a.append(f' + {s}')
         else:
-            s = f'{constants[i]}*x^{sorted_degrees[i]}'
-            a.append(s)
+            if not no_zero or constants[i] != 0:
+                s = f'{constants[i]}*x^{sorted_degrees[i]}'
+                a.append(s)
+                started = True
+    if not started:
+        return '0'
     return ''.join(a)
