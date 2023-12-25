@@ -5,7 +5,7 @@ import src.util.util as util
 from src.functions.functions import Mathematical
 
 #FUNCTIONS = [Mathematical.add, Mathematical.sub, Mathematical.mul, Mathematical.div]
-FUNCTIONS = [Mathematical.add, Mathematical.mul, Mathematical.sub]
+FUNCTIONS = [Mathematical.add, Mathematical.mul]
 TERMINALS = ['x', 1]
 VARIABLES = [terminal for terminal in TERMINALS if type(terminal) == str]
 

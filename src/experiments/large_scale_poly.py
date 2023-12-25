@@ -108,18 +108,36 @@ class Poly:
                 ans += x
         return 2*ans + 2*rest
 
+    # integration with limits 0, 1
+    def integrate2(self):
+        ans, rest = 0, 0
+        for d, c in zip(self.ds, self.cs):
+            x = c//(d+1)
+            rest += (c-x*(d+1))/(d+1)
+            ans += x
+        return ans + rest
+
+
 
 def test_poly():
     P1 = Poly([2],[1]).add(Poly([1],[1])).mul(Poly([0],[1]))
     print(P1.integrate1())
 
 
-F = Poly([i for i in range(0, 101)], [(-1)**i * (i + 1) * 10 for i in range(0, 101)])
-def loss(y_poly):
+# F = Poly([i for i in range(0, 101)], [(-1)**i * (i + 1) * 10 for i in range(0, 101)])
+# def loss(y_poly):
+    # F_copy = Poly(F.ds, F.cs)
+    # F_copy.sub(y_poly)
+    # F_copy.mul(F_copy)
+    # return F_copy.integrate1()
+
+
+F = Poly([100], [1])
+def loss2(y_poly):
     F_copy = Poly(F.ds, F.cs)
     F_copy.sub(y_poly)
     F_copy.mul(F_copy)
-    return F_copy.integrate1()
+    return F_copy.integrate2()
 
 
 print('Target function:', analysis.sorted_degrees_constants_to_str(F.ds, F.cs), file=sys.stderr)
@@ -142,11 +160,14 @@ def opoGP(mutation_type):
     x = ParseTree()
     x.symbol = 1
     x_poly = Poly(*analysis.normalize_polynomial(x))
-    fx = loss(x_poly)
+    fx = loss2(x_poly)
     print('initial:', fx)
 
+    print('Domain [0, 1]', file=sys.stderr)
     mylog(0, x, True, True, fx, 1., x_poly)
     for gen in range(1,MAXGEN+1):
+        if fx == 0:
+            break
         y = x.clone()
         if mutation_type == 'probabilistic_subtree_mutation':
             variation.probabilistic_subtree_mutation(y, 0.1)
@@ -155,7 +176,7 @@ def opoGP(mutation_type):
         else:
             raise ValueError(f'No such mutation operator {mutation_type}')
         y_poly = Poly(*analysis.normalize_polynomial(y))
-        fy = loss(y_poly)
+        fy = loss2(y_poly)
         new_sub = len(set(d for d,c in zip(y_poly.ds,y_poly.cs) if c!=0)-set(d for d,c in zip(x_poly.ds,x_poly.cs) if c!=0)) != 0
         cs_dist = euclidean_dist(x_poly, y_poly)
         mylog(gen, y, new_sub, fy<fx, fy, cs_dist, y_poly)
