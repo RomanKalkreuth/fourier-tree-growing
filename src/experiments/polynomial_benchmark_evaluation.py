@@ -44,13 +44,21 @@ def print_configuarion():
     print("Instances: %d" % INSTANCES)
     print("Evaluations: %d" % NUM_EVALUATIONS)
     print("Algorithm: %s" % str(ALGORITHM))
+    print("Degree: %s" % str(DEGREE))
+    print("")
     match ALGORITHM:
         case algorithm.one_plus_lambda:
             print("Lambda: %d" % LAMBDA)
+        case algorithm.canonical_ea:
+            print("Population size: %d" % POPULATION_SIZE)
+            print("Tournament size: %d" % TOURNAMENT_SIZE)
+            print("Elites: %d" % NUM_ELITES)
+            print("Crossover rate: %f" % CROSSOVER_RATE)
+            print("Mutation rate: %f" % MUTATION_RATE)
 
 
-def run():
-    for instance in range(0, INSTANCES):
+def run(instances):
+    for instance in range(0, instances):
         match ALGORITHM:
             case algorithm.one_plus_lambda:
                 num_evals = algorithm.one_plus_lambda(max_evaluations=NUM_EVALUATIONS,
@@ -83,22 +91,24 @@ def run():
                                                    tournament_size=TOURNAMENT_SIZE,
                                                    stopping_criteria=IDEAL_COST,
                                                    num_elites=NUM_ELITES)
-    print(num_evals)
+        print(num_evals)
 
 
 if __name__ == '__main__':
     algo = 0
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--interfaces", type=int, help="Number of instances")
+    parser.add_argument("--instances", type=int, help="Number of instances")
     parser.add_argument("--evaluations", type=int, help="Number of evaluations")
     parser.add_argument("--algorithm", type=int, help="Search algorithm")
+
+    parser.add_argument("--degree", type=int, help="Polynomial degree")
 
     parser.add_argument("--mu", type=int, help="Number of parents")
     parser.add_argument("--lmbda", type=int, help="Number of offsprings")
 
-    parser.add_argument("--crate", type=int, help="Crossover rate")
-    parser.add_argument("--mrate", type=int, help="Mutation rate")
+    parser.add_argument("--crate", type=float, help="Crossover rate")
+    parser.add_argument("--mrate", type=float, help="Mutation rate")
 
     parser.add_argument("--popsize", type=int, help="Population size")
     parser.add_argument("--tsize", type=int, help="Tournament size")
@@ -110,11 +120,13 @@ if __name__ == '__main__':
         INSTANCES = args.instances
     if args.evaluations:
         NUM_EVALUATIONS = args.evaluations
+    if args.degree:
+        DEGREE = args.degree
 
     match args.algorithm:
         case 0:
             ALGORITHM = algorithm.one_plus_lambda
-            if args.l:
+            if args.lmbda:
                 LAMBDA = args.lmbda
         case 1:
             ALGORITHM = algorithm.mu_plus_lambda
@@ -124,6 +136,7 @@ if __name__ == '__main__':
                 MU = args.mu
             if args.crate:
                 CROSSOVER_RATE = args.crate
+
         case 2:
             ALGORITHM = algorithm.canonical_ea
             if args.crate:
@@ -134,7 +147,9 @@ if __name__ == '__main__':
                 POPULATION_SIZE = args.popsize
             if args.tsize:
                 TOURNAMENT_SIZE = args.tsize
-            if args.elites:
+            if args.nelites:
                 NUM_ELITES = args.nelites
 
-    print_configuarion()
+    #print_configuarion()
+    #print("")
+    run(instances=INSTANCES)
