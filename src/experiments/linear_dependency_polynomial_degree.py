@@ -1,7 +1,6 @@
 import sys
 import random
 from operator import itemgetter
-
 import numpy as np
 
 sys.path.insert(0, '../representation')
@@ -51,7 +50,7 @@ for instance in range(0, INSTANCES):
         seq1 = [float(parent.evaluate(x)) for x in X]
         x_lin, y_lin = analysis.function_values(parent, -10, 10, 100)
         deg1 = analysis.polynomial_degree_fit(x_lin, y_lin, MAX_DEG)
-        dep1 = parent.depth()
+        depth1 = parent.depth()
         dgrs1, cnts1 = analysis.normalize_polynomial(parent)
         norm1 = analysis.sorted_degrees_constants_to_str(dgrs1, cnts1)
 
@@ -64,6 +63,7 @@ for instance in range(0, INSTANCES):
             candidate = parent.clone()
 
             variation.uniform_subtree_mutation(tree=candidate, max_depth=MAX_SUBTREE_DEPTH)
+            #variation.probabilistic_subtree_mutation(tree=candidate, mutation_rate=MUTATION_RATE, max_depth=MAX_SUBTREE_DEPTH)
 
             cost = evaluation.evaluate(candidate, X, y, f_eval)
             seq = [float(candidate.evaluate(x)) for x in X]
@@ -74,7 +74,12 @@ for instance in range(0, INSTANCES):
             dgrs, cnts = analysis.normalize_polynomial(candidate)
             norm = analysis.sorted_degrees_constants_to_str(dgrs, cnts)
 
-            print(f'Generation {gen}, Norm of parent: {norm1}, Norm of offspring: {norm}', file=sys.stderr)
+            depth = candidate.depth()
+
+            #print(f'Generation {gen}, norm of parent: {norm1}, norm of offspring: {norm}, '
+            #      f'depth of parent: {depth1}, depth of offspring: {depth}', file=sys.stderr)
+
+            print(f'Generation {gen}, norm of parent: {norm1}, norm of offspring: {norm}', file=sys.stderr)
 
             candidates.append((candidate, cost, seq[:], deg))
             sequences.append(seq[:])
@@ -85,7 +90,7 @@ for instance in range(0, INSTANCES):
 
         if evaluation.is_better(best_cost_gen, best_cost, minimizing=True, strict=True):
             deg = candidates[0][3]
-            dep = best_candidate.depth()
+            depth = best_candidate.depth()
 
             if deg1 != deg:
                 linear_dependency = False

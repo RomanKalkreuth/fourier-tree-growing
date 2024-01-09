@@ -38,7 +38,6 @@ def is_ideal(cost, ideal_cost, minimizing=True):
 def evaluate(tree, X, y, f_eval):
     cost = 0.0
     dim = len(X)
-    loss_vec = np.zeros(dim)
     for i, x in enumerate(X):
         y_pred = tree.evaluate(x)
         loss = f_eval(y_pred, y[i])

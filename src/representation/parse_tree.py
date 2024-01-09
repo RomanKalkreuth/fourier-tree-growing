@@ -6,7 +6,7 @@ from src.functions.functions import Mathematical
 
 #FUNCTIONS = [Mathematical.add, Mathematical.sub, Mathematical.mul, Mathematical.div]
 FUNCTIONS = [Mathematical.add, Mathematical.mul, Mathematical.sub]
-TERMINALS = ['x', 1]
+TERMINALS = ['x']
 VARIABLES = [terminal for terminal in TERMINALS if type(terminal) == str]
 
 FUNCTION_CLASS = Mathematical

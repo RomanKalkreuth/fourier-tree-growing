@@ -14,6 +14,10 @@ from random import random
 
 def subtree_crossover(ptree1, ptree2, crossover_rate):
     if random() < crossover_rate:
+
+        if ptree1.size() <= 1 or ptree2.size() <= 1:
+            return ptree1, ptree2
+
         crossover_point1 = randint(1, ptree1.size() - 1)
         crossover_point2 = randint(1, ptree2.size() - 1)
 

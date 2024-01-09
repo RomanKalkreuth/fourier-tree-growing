@@ -18,6 +18,9 @@ def uniform_subtree_mutation(tree: object, max_depth: int = 6):
 
 def subtree_crossover(ptree1, ptree2, crossover_rate):
     if random.random() < crossover_rate:
+        if ptree1.size() <= 1 or ptree2.size() <= 1:
+            return ptree1, ptree2
+
         crossover_point1 = random.randint(1, ptree1.size() - 1)
         crossover_point2 = random.randint(1, ptree2.size() - 1)
 

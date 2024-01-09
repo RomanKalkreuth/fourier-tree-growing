@@ -12,8 +12,9 @@ __email__ = 'Roman.Kalkreuth@lip6.fr'
 import random
 import queue
 from gp_simple import GPSimple
+from gp_tree import GPNode
 
-def subtree_mutation(tree: object, mutation_rate: float, max_depth: int = 6):
+def probabilistic_subtree_mutation(tree: object, mutation_rate: float, max_depth: int = 6):
     """
     Standard subtree mutation operator which is commonly used in GP.
 
@@ -23,9 +24,16 @@ def subtree_mutation(tree: object, mutation_rate: float, max_depth: int = 6):
     if random.random() < mutation_rate:
         tree.random_tree(grow=True, min_depth=1, max_depth=max_depth)
     elif tree.left is not None:
-        subtree_mutation(tree=tree.left, mutation_rate=mutation_rate, max_depth=max_depth)
+        probabilistic_subtree_mutation(tree=tree.left, mutation_rate=mutation_rate, max_depth=max_depth)
     elif tree.right is not None:
-        subtree_mutation(tree=tree.right, mutation_rate=mutation_rate, max_depth=max_depth)
+        probabilistic_subtree_mutation(tree=tree.right, mutation_rate=mutation_rate, max_depth=max_depth)
+
+def uniform_subtree_mutation(tree: object, max_depth: int = 6):
+    mutation_point = random.randint(1, tree.size() - 1)
+    subtree = GPNode()
+    subtree.init_tree(1, max_depth)
+    tree.replace_subtree(subtree, mutation_point)
+
 
 
 def node_mutation(tree: object, n: int):

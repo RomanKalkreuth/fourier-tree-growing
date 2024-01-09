@@ -2,10 +2,12 @@
 # Roman Kalkreuth (Roman.Kalkreuth@lip6.fr)
 # Computer Lab of Paris 6, Sorbonne Université (Paris, France)
 
+from operator import itemgetter
 import gp_fitness as fitness
 import gp_selection as selection
 import gp_crossover as crossover
 from gp_tree import GPNode
+
 
 __author__ = 'Roman Kalkreuth'
 __copyright__ = 'Copyright (C) 2023, Roman Kalkreuth'
@@ -98,10 +100,10 @@ def canonical_ea(max_generations=100,
     num_evaluations = 0
 
     for gen in range(max_generations):
-        sort_individuals(population, minimizing_fitness=minimizing_fitness)
+        population = sorted(population, key=itemgetter(1), reverse=not minimizing_fitness)
         best_fitness = population[0][1]
         elites = population[0:num_elites]
-        offspring = []
+        offsprings = []
 
         if fitness.is_ideal(best_fitness, ideal_fitness=stopping_criteria):
             if not silent:
@@ -118,19 +120,14 @@ def canonical_ea(max_generations=100,
             ptree1, ptree2 = parent1[0], parent2[0]
             otree = breed_offspring(ptree1, ptree2, crossover_rate, mutation_rate, subtree_depth)
 
-            offspring.append((otree, None))
+            offsprings.append((otree, None))
 
-        evaluate_individuals(offspring, problem, fitness_metric=fitness_metric)
+        evaluate_individuals(offsprings, problem, fitness_metric=fitness_metric)
         num_evaluations += num_offspring
 
-        population = elites + offspring
+        population = elites + offsprings
 
     return best_fitness, num_evaluations
-
-
-def sort_individuals(population, minimizing_fitness=True):
-    population.sort(key=lambda tup: tup[1], reverse=not minimizing_fitness)
-    return population
 
 
 def breed_offspring(tree1, tree2, crossover_rate, mutation_rate, subtree_depth):

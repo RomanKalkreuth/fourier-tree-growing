@@ -193,7 +193,7 @@ class GPNode:
                               and is passed on to the mutation operator
         :type mutation_rate float
         """
-        mutation.subtree_mutation(self, mutation_rate=mutation_rate, max_depth=subtree_depth)
+        mutation.probabilistic_subtree_mutation(self, mutation_rate=mutation_rate, max_depth=subtree_depth)
 
     def subtree_at(self, node_num: int):
         """
