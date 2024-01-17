@@ -143,6 +143,7 @@ def canonical_ea(max_evaluations, X, y, f_eval,
 
     max_generations = max_evaluations // num_offspring
 
+
     while num_evaluations < max_evaluations:
         population = sorted(population, key=itemgetter(1), reverse=not minimizing)
         best_cost = population[0][1]
