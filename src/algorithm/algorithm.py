@@ -134,7 +134,7 @@ def canonical_ea(max_evaluations, X, y, f_eval,
                  stopping_criteria=0.01,
                  num_elites=1,
                  minimizing=True,
-                 max_tree_depth=10):
+                 max_tree_depth=30):
     num_evaluations = 0
     num_offspring = population_size - num_elites
 
