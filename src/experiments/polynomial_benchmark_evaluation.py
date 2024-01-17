@@ -32,11 +32,6 @@ NUM_ELITES = 2
 
 DEGREE = 6
 
-objective_function = functions.polynomial
-X = generator.random_samples_float(-1.0, 1.0, 20, dim=1)
-y = generator.generate_polynomial_values(X, degree=DEGREE)
-f_eval = evaluation.absolute_error
-
 random.seed()
 
 
@@ -58,10 +53,14 @@ def print_configuarion():
 
 
 def run(instances):
+
+    X = generator.random_samples_float(-1.0, 1.0, 20, dim=1)
+    y = generator.generate_polynomial_values(X, degree=DEGREE)
+
     for instance in range(0, instances):
         match ALGORITHM:
             case algorithm.one_plus_lambda:
-                num_evals = algorithm.one_plus_lambda(max_evaluations=NUM_EVALUATIONS,
+                result = algorithm.one_plus_lambda(max_evaluations=NUM_EVALUATIONS,
                                                       lmbda=LAMBDA,
                                                       X=X, y=y,
                                                       f_eval=EVALUATION_FUNCTION,
@@ -69,7 +68,7 @@ def run(instances):
                                                       max_subtree_depth=MAX_SUBTREE_DEPTH,
                                                       stopping_criteria=IDEAL_COST)
             case algorithm.mu_plus_lambda:
-                num_evals = algorithm.mu_plus_lambda(max_evaluations=NUM_EVALUATIONS,
+                result = algorithm.mu_plus_lambda(max_evaluations=NUM_EVALUATIONS,
                                                      mu=MU,
                                                      lmbda=LAMBDA,
                                                      X=X, y=y,
@@ -80,7 +79,7 @@ def run(instances):
                                                      max_subtree_depth=MAX_SUBTREE_DEPTH,
                                                      stopping_criteria=IDEAL_COST)
             case algorithm.canonical_ea:
-                num_evals = algorithm.canonical_ea(max_evaluations=NUM_EVALUATIONS,
+                result = algorithm.canonical_ea(max_evaluations=NUM_EVALUATIONS,
                                                    X=X, y=y,
                                                    f_eval=EVALUATION_FUNCTION,
                                                    population_size=POPULATION_SIZE,
@@ -91,7 +90,7 @@ def run(instances):
                                                    tournament_size=TOURNAMENT_SIZE,
                                                    stopping_criteria=IDEAL_COST,
                                                    num_elites=NUM_ELITES)
-        print(num_evals)
+        print(result)
 
 
 if __name__ == '__main__':

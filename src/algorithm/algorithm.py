@@ -133,7 +133,8 @@ def canonical_ea(max_evaluations, X, y, f_eval,
                  tournament_size=7,
                  stopping_criteria=0.01,
                  num_elites=1,
-                 minimizing=True):
+                 minimizing=True,
+                 max_tree_depth=10):
     num_evaluations = 0
     num_offspring = population_size - num_elites
 
@@ -142,9 +143,13 @@ def canonical_ea(max_evaluations, X, y, f_eval,
 
     max_generations = max_evaluations // num_offspring
 
-    for gen in range(0, max_generations):
+    while num_evaluations < max_evaluations:
         population = sorted(population, key=itemgetter(1), reverse=not minimizing)
         best_cost = population[0][1]
+
+        if evaluation.is_ideal(best_cost, ideal_cost=stopping_criteria):
+            break
+
         elites = population[0:num_elites]
         offsprings = []
 
@@ -159,6 +164,9 @@ def canonical_ea(max_evaluations, X, y, f_eval,
                                     mutation_type='probabilistic',
                                     mutation_rate=mutation_rate)
 
+            if otree.depth() > max_tree_depth:
+               otree = ptree1
+
             offsprings.append((otree, None))
 
         evaluate_individuals(offsprings, X, y, f_eval)
@@ -166,10 +174,7 @@ def canonical_ea(max_evaluations, X, y, f_eval,
 
         population = elites + offsprings
 
-        if evaluation.is_ideal(best_cost, ideal_cost=stopping_criteria):
-            break
-
-    return num_evaluations
+    return num_evaluations, best_cost
 
 
 def init_population(population_size, tree_init_depth, X, y, f_eval):

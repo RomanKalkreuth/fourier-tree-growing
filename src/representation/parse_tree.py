@@ -2,11 +2,12 @@ from random import random, randint
 import numpy as np
 import queue
 import src.util.util as util
+import src.constants.constants as constants
 from src.functions.functions import Mathematical
 
 #FUNCTIONS = [Mathematical.add, Mathematical.sub, Mathematical.mul, Mathematical.div]
 FUNCTIONS = [Mathematical.add, Mathematical.mul, Mathematical.sub, Mathematical.div]
-TERMINALS = ['x', 1]
+TERMINALS = ['x', constants.koza_erc()]
 VARIABLES = [terminal for terminal in TERMINALS if type(terminal) == str]
 
 FUNCTION_CLASS = Mathematical
