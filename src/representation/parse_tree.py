@@ -5,9 +5,8 @@ import src.util.util as util
 import src.constants.constants as constants
 from src.functions.functions import Mathematical
 
-#FUNCTIONS = [Mathematical.add, Mathematical.sub, Mathematical.mul, Mathematical.div]
 FUNCTIONS = [Mathematical.add, Mathematical.mul, Mathematical.sub, Mathematical.div]
-TERMINALS = ['x', constants.koza_erc()]
+TERMINALS = ['x', constants.koza_erc]
 VARIABLES = [terminal for terminal in TERMINALS if type(terminal) == str]
 
 FUNCTION_CLASS = Mathematical
@@ -20,6 +19,20 @@ GROW = True
 NUM_FUNCTIONS = len(FUNCTIONS)
 NUM_TERMINALS = len(TERMINALS)
 NUM_VARIABLES = len(VARIABLES)
+
+
+def set_functions(fns):
+    global FUNCTIONS, NUM_FUNCTIONS
+    FUNCTIONS = fns
+    NUM_FUNCTIONS = len(FUNCTIONS)
+
+
+def set_terminals(tms):
+    global TERMINALS, VARIABLES, NUM_TERMINALS, NUM_VARIABLES
+    TERMINALS = tms
+    VARIABLES = [terminal for terminal in TERMINALS if type(terminal) == str]
+    NUM_TERMINALS = len(TERMINALS)
+    NUM_VARIABLES = len(VARIABLES)
 
 
 class ParseTree:
@@ -40,12 +53,16 @@ class ParseTree:
     def random_tree(self, grow: bool, min_depth: int, max_depth: int, depth: int = 0):
         if depth >= max_depth - 1:
             self.symbol = TERMINALS[randint(0, NUM_TERMINALS - 1)]
+            if callable(self.symbol):
+                self.symbol = self.symbol()
         else:
             if grow is True:
                 if random() < 0.5 or depth < min_depth:
                     self.symbol = FUNCTIONS[randint(0, NUM_FUNCTIONS - 1)]
                 else:
                     self.symbol = TERMINALS[randint(0, NUM_TERMINALS - 1)]
+                    if callable(self.symbol):
+                        self.symbol = self.symbol()
             else:
                 self.symbol = FUNCTIONS[randint(0, NUM_FUNCTIONS - 1)]
 
