@@ -179,6 +179,7 @@ def parse_exp_directory(directory, csvfilename):
             sd = os.path.join(directory, subdirectory)
             if os.path.isdir(sd) and subdirectory.startswith('A-'):
                 di = parse_setup_directory(sd)
+                print(di.alg)
                 av_min_loss, std_min_loss, cnt = component_mean_err(di.min_losses_per_gen)
                 av_max_span, std_max_span, cnt = component_mean_err(di.max_spans_per_gen)
                 av_av_tdepth, std_av_tdepth, cnt = component_mean_err(di.av_tdepths_per_gen)
@@ -194,5 +195,6 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--dirs', type=str, nargs='+', help='list of exp directories')
 args = parser.parse_args()
 for expdir in args.dirs:
+    print(expdir)
     parse_exp_directory(expdir, csvfilename)
 
