@@ -3,7 +3,7 @@ import numpy as np
 import datetime
 import argparse
 
-
+CS_DTYPE = int
 def parse_poly_str(str_poly):
     ds, cs = [], []
     sign = 1
@@ -17,7 +17,7 @@ def parse_poly_str(str_poly):
                 d = t.split('^')[1]
                 ds.append(int(d))
             else:
-                cs.append(int(t)*sign)
+                cs.append(CS_DTYPE(t)*sign)
                 sign = 1
     if len(ds) == 0 and len(cs) == 1:
         ds.append(0)
@@ -151,6 +151,11 @@ def parse_setup_subdir_name(name, di):
     di.lambda_ = int(terms[1].lstrip('L'))
     di.degree = int(terms[2].lstrip('D'))
     di.constant = terms[3].lstrip('C-')
+    global CS_DTYPE
+    if di.constant == 'koza-erc':
+        CS_DTYPE = float
+    else:
+        CS_DTYPE = int
 
 
 def parse_setup_directory(directory):
