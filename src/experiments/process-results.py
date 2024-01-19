@@ -173,8 +173,7 @@ def parse_setup_directory(directory):
 
 
 def parse_exp_directory(directory, csvfilename):
-    with open(csvfilename, 'w') as csvfile:
-        print('alg,lambda_,degree,constant,numruns,gen_number,cnt,av_min_loss,std_min_loss,av_max_span,std_max_span,av_av_tdepth,std_av_tdepth,av_av_tsize,std_av_tsize',file=csvfile)
+    with open(csvfilename, 'a') as csvfile:
         for subdirectory in os.listdir(directory):
             sd = os.path.join(directory, subdirectory)
             if os.path.isdir(sd) and subdirectory.startswith('A-'):
@@ -194,6 +193,8 @@ csvfilename = f'processed_{timestamp}.csv'
 parser = argparse.ArgumentParser()
 parser.add_argument('--dirs', type=str, nargs='+', help='list of exp directories')
 args = parser.parse_args()
+with open(csvfilename, 'w') as csvfile:
+    print('alg,lambda_,degree,constant,numruns,gen_number,cnt,av_min_loss,std_min_loss,av_max_span,std_max_span,av_av_tdepth,std_av_tdepth,av_av_tsize,std_av_tsize',file=csvfile)
 for expdir in args.dirs:
     print(expdir)
     parse_exp_directory(expdir, csvfilename)
