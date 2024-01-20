@@ -400,6 +400,8 @@ def main():
     args = parser.parse_args()
 
     INSTANCE = args.instance
+    np.random.seed(INSTANCE)
+    random.seed(INSTANCE)
     DEGREE = args.degree
     ALGORITHM = args.algorithm
     if args.evaluations:
@@ -438,6 +440,8 @@ def main():
             if args.nelites:
                 NUM_ELITES = args.nelites
     F = Poly([i for i in range(DEGREE + 1)], [1 for _ in range(DEGREE + 1)])
+    if args.constant == 'none':
+        F = Poly([i for i in range(1, DEGREE + 1)], [1 for _ in range(1, DEGREE + 1)])
     # F = Poly([DEGREE], [1])
     dirname = args.dirname
     os.makedirs(dirname, exist_ok=True)
