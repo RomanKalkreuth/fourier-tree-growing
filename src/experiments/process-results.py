@@ -53,6 +53,9 @@ class GenInfo:
         self.gen_sum_td = 0
         self.gen_sum_ts = 0
         self.gen_offspring_cnt = 0
+        self.all_min_loss = float("inf")
+        self.all_max_span = 0
+        self.cnt_loss_reduced_span_increased = 0
 
     def update(self, gen, depth, size, loss, ds, cs):
         self.gen_number = gen
@@ -61,6 +64,11 @@ class GenInfo:
         self.gen_sum_td += depth
         self.gen_sum_ts += size
         self.gen_offspring_cnt += 1
+        if loss < self.all_min_loss:
+            self.all_min_loss = loss
+            if len(ds) > self.all_max_span:
+                self.all_max_span = len(ds)
+                self.cnt_loss_reduced_span_increased += 1
 
     def reset(self):
         self.gen_max_span = 0
@@ -77,6 +85,8 @@ class FileInfo:
         self.gen_max_span = []
         self.gen_av_td = []
         self.gen_av_ts = []
+        self.gen_is_loss_reduced_span_increased = []
+        self.cnt_loss_reduced_span_increased = 0
 
     def update(self, gi):
         self.gen_number.append(gi.gen_number)
@@ -84,6 +94,7 @@ class FileInfo:
         self.gen_max_span.append(gi.gen_max_span)
         self.gen_av_td.append(gi.gen_sum_td / gi.gen_offspring_cnt)
         self.gen_av_ts.append(gi.gen_sum_ts / gi.gen_offspring_cnt)
+        self.cnt_loss_reduced_span_increased = gi.cnt_loss_reduced_span_increased
 
 
 class DirInfo:
@@ -97,6 +108,7 @@ class DirInfo:
         self.max_spans_per_gen = []
         self.av_tdepths_per_gen = []
         self.av_tsize_per_gen = []
+        self.cnt_events = []
 
     def update(self, fi):
         self.numruns += 1
@@ -104,6 +116,7 @@ class DirInfo:
         self.max_spans_per_gen.append(fi.gen_max_span)
         self.av_tdepths_per_gen.append(fi.gen_av_td)
         self.av_tsize_per_gen.append(fi.gen_av_ts)
+        self.cnt_events.append(fi.cnt_loss_reduced_span_increased)
 
 
 def parse_file(filename):
@@ -183,8 +196,9 @@ def parse_exp_directory(directory, csvfilename):
                 av_max_span, std_max_span, cnt = component_mean_err(di.max_spans_per_gen)
                 av_av_tdepth, std_av_tdepth, cnt = component_mean_err(di.av_tdepths_per_gen)
                 av_av_tsize, std_av_tsize, cnt = component_mean_err(di.av_tsize_per_gen)
+                av_cnt_event, std_cnt_event = np.mean(di.cnt_events), np.std(di.cnt_events)
                 for i in range(len(av_min_loss)):
-                    print(di.alg, di.lambda_, di.degree, di.constant, di.numruns, i, cnt[i], av_min_loss[i], std_min_loss[i], av_max_span[i], std_max_span[i], av_av_tdepth[i], std_av_tdepth[i], av_av_tsize[i], std_av_tsize[i], sep=',', file=csvfile)
+                    print(di.alg, di.lambda_, di.degree, di.constant, di.numruns, i, cnt[i], av_min_loss[i], std_min_loss[i], av_max_span[i], std_max_span[i], av_av_tdepth[i], std_av_tdepth[i], av_av_tsize[i], std_av_tsize[i], av_cnt_event, std_cnt_event, sep=',', file=csvfile)
 
 
 now = datetime.datetime.now()
@@ -194,7 +208,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--dirs', type=str, nargs='+', help='list of exp directories')
 args = parser.parse_args()
 with open(csvfilename, 'w') as csvfile:
-    print('alg,lambda_,degree,constant,numruns,gen_number,cnt,av_min_loss,std_min_loss,av_max_span,std_max_span,av_av_tdepth,std_av_tdepth,av_av_tsize,std_av_tsize',file=csvfile)
+    print('alg,lambda_,degree,constant,numruns,gen_number,cnt,av_min_loss,std_min_loss,av_max_span,std_max_span,av_av_tdepth,std_av_tdepth,av_av_tsize,std_av_tsize,av_cnt_event,std_cnt_event',file=csvfile)
 for expdir in args.dirs:
     print(expdir)
     parse_exp_directory(expdir, csvfilename)
