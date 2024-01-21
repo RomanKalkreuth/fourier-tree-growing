@@ -36,6 +36,7 @@ class DirInfo:
         self.alg = None
         self.benchmark = None
         self.constant = None
+        self.lambda_ = None
         self.numruns = 0
         self.instance_number = []
         self.instance_cnt_tol = []
@@ -108,6 +109,7 @@ def component_mean_err(data):
 def parse_setup_subdir_name(name, di):
     terms = name.split('_')
     di.alg = terms[0].lstrip('A-')
+    di.lambda_ = int(terms[1].lstrip('L'))
     di.benchmark = terms[2].lstrip('B-')
     di.constant = terms[3].lstrip('C-')
 
@@ -132,7 +134,7 @@ def parse_exp_directory(directory, csvfilename):
                 di = parse_setup_directory(sd)
                 print(di.alg)
                 for i in range(di.numruns):
-                    print(di.alg, di.benchmark, di.constant, di.numruns,di.instance_number[i], sep=',', end='', file=csvfile)
+                    print(di.alg, di.benchmark, di.constant, di.lambda_, di.numruns,di.instance_number[i], sep=',', end='', file=csvfile)
                     for j in range(len(di.instance_cnt_tol[i])):
                         print(',', di.instance_cnt_tol[i][j], sep='', end='', file=csvfile)
                     print(file=csvfile)
@@ -146,7 +148,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--dirs', type=str, nargs='+', help='list of exp directories')
 args = parser.parse_args()
 with open(csvfilename, 'w') as csvfile:
-    print('alg,benchmark,constant,numruns,instance,evals_to_tol_0,evals_to_tol_1,evals_to_tol_2,evals_to_tol_3,evals_to_tol_4,evals_to_tol_5,evals_to_tol_6,evals_to_tol_7,evals_to_tol_8,evals_to_tol_9',file=csvfile)
+    print('alg,benchmark,constant,lambda_,numruns,instance,evals_to_tol_0,evals_to_tol_1,evals_to_tol_2,evals_to_tol_3,evals_to_tol_4,evals_to_tol_5,evals_to_tol_6,evals_to_tol_7,evals_to_tol_8,evals_to_tol_9',file=csvfile)
 for expdir in args.dirs:
     print(expdir)
     parse_exp_directory(expdir, csvfilename)
