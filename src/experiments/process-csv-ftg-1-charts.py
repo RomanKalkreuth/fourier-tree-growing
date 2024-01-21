@@ -6,14 +6,15 @@ from matplotlib.ticker import (AutoMinorLocator, MultipleLocator, MaxNLocator)
 import numpy as np
 
 
-csvfilename = '../../data/ftg/processed_21-01-2024_21h12m22s.csv'
+csvfilename = '../../data/ftg/processed_21-01-2024_21h33m53s.csv'
 
 mpl.rcParams['pdf.fonttype'] = 42
 mpl.rcParams['ps.fonttype'] = 42
 
 K = 5
 BUDGET = 10**5
-ALG = 'ftg'
+ALG = 'canonical-ea'
+LAMBDA = 500
 
 fig, axs = plt.subplots(1, 1)
 df = pd.read_csv(csvfilename, low_memory=False)
@@ -23,13 +24,22 @@ for benchmark in benchmarks:
     df1 = df.loc[(df['alg']==ALG) & (df['benchmark'] == benchmark)]
     s = df1[f'evals_to_tol_{K}']
     evals_to_tol = s[s.apply(lambda x: x <= BUDGET)].values
-    mean = np.mean(evals_to_tol)
-    sd = np.std(evals_to_tol)
-    sem = sd / np.sqrt(len(evals_to_tol))
-    q1 = np.percentile(evals_to_tol, 25)
-    median = np.percentile(evals_to_tol, 50)
-    q3 = np.percentile(evals_to_tol, 75)
-    sr = len(evals_to_tol) / float(df1['numruns'].values[0]) * 100
+    if len(evals_to_tol) != 0:
+        mean = np.mean(evals_to_tol)
+        sd = np.std(evals_to_tol)
+        sem = sd / np.sqrt(len(evals_to_tol))
+        q1 = np.percentile(evals_to_tol, 25)
+        median = np.percentile(evals_to_tol, 50)
+        q3 = np.percentile(evals_to_tol, 75)
+        sr = len(evals_to_tol) / float(df1['numruns'].values[0]) * 100
+    else:
+        mean = float("inf")
+        sd = 0
+        sem = 0
+        q1 = float("inf")
+        median = float("inf")
+        q3 = float("inf")
+        sr = 0
     print('problem, alg, tolerance, mean, sd, sem, q1, median, q3, sr')
     print(f'{benchmark} & {ALG} & {10**(-K):.10f} & {mean:.3f} & {sd:.3f} & {sem:.3f} & {q1:.3f} & {median:.3f} & {q3:.3f} & {sr:.3f}')
     y = np.zeros(BUDGET, dtype=int)
