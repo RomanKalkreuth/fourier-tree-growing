@@ -6,19 +6,19 @@ from matplotlib.ticker import (AutoMinorLocator, MultipleLocator, MaxNLocator)
 import numpy as np
 
 
-csvfilename = './processed_21-01-2024_19h48m11s.csv'
+csvfilename = '../../data/ftg/processed_21-01-2024_21h12m22s.csv'
 
 mpl.rcParams['pdf.fonttype'] = 42
 mpl.rcParams['ps.fonttype'] = 42
 
-K = 3
+K = 5
 BUDGET = 10**5
-ALG = 'one-plus-lambda'
+ALG = 'ftg'
 
 fig, axs = plt.subplots(1, 1)
 df = pd.read_csv(csvfilename, low_memory=False)
-# benchmarks = ['koza1','koza2','koza3','nguyen3','nguyen4','nguyen5','nguyen6','nguyen7','nguyen8']
-benchmarks = ['koza1']
+benchmarks = ['koza1','koza2','koza3','nguyen3','nguyen4','nguyen5','nguyen6','nguyen7','nguyen8']
+# benchmarks = ['koza1']
 for benchmark in benchmarks:
     df1 = df.loc[(df['alg']==ALG) & (df['benchmark'] == benchmark)]
     s = df1[f'evals_to_tol_{K}']
@@ -29,9 +29,9 @@ for benchmark in benchmarks:
     q1 = np.percentile(evals_to_tol, 25)
     median = np.percentile(evals_to_tol, 50)
     q3 = np.percentile(evals_to_tol, 75)
-    sr = len(evals_to_tol) / float(df1['numruns'].values[0])
-    print('tolerance, mean, sd, sem, q1, median, q3, sr)')
-    print(f'{10**(-K):.10f} & {mean:.3f} & {sd:.3f} & {sem:.3f} & {q1:.3f} & {median:.3f} & {q3:.3f} & {sr:.3f}')
+    sr = len(evals_to_tol) / float(df1['numruns'].values[0]) * 100
+    print('problem, alg, tolerance, mean, sd, sem, q1, median, q3, sr')
+    print(f'{benchmark} & {ALG} & {10**(-K):.10f} & {mean:.3f} & {sd:.3f} & {sem:.3f} & {q1:.3f} & {median:.3f} & {q3:.3f} & {sr:.3f}')
     y = np.zeros(BUDGET, dtype=int)
     for evals in evals_to_tol:
         y[evals] += 1
