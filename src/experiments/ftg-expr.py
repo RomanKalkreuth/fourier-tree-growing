@@ -407,6 +407,8 @@ def main():
     parser.add_argument("--tsize", type=int, help="Tournament size")
     parser.add_argument("--nelites", type=int, help="Number of elites")
 
+    parser.add_argument("--cnt", type=int, help="Number of instances to run sequentially starting from $instance", default=1)
+
     required_named = parser.add_argument_group('Required Named Arguments')
     required_named.add_argument("--benchmark", type=str, help="Benchmark problem",
                                 choices=BENCHMARS1D.keys())
@@ -420,8 +422,6 @@ def main():
     args = parser.parse_args()
 
     INSTANCE = args.instance
-    np.random.seed(INSTANCE)
-    random.seed(INSTANCE)
     F = BENCHMARS1D[args.benchmark]
     ALGORITHM = args.algorithm
     if args.evaluations:
@@ -433,9 +433,7 @@ def main():
     elif args.constant == '1':
         parse_tree.set_terminals(['x', 1])
     elif args.constant == 'koza-erc':
-        global TREE_CS_TYPE
         parse_tree.set_terminals(['x', constants.koza_erc])
-        TREE_CS_TYPE = float
 
     match ALGORITHM:
         case 'one-plus-lambda':
@@ -459,58 +457,58 @@ def main():
                 TOURNAMENT_SIZE = args.tsize
             if args.nelites:
                 NUM_ELITES = args.nelites
-    # F = Poly([i for i in range(DEGREE + 1)], [1 for _ in range(DEGREE + 1)])
-    # if args.constant == 'none':
-    #     F = Poly([i for i in range(1, DEGREE + 1)], [1 for _ in range(1, DEGREE + 1)])
-    # F = Poly([DEGREE], [1])
-    if args.benchmark.startswith('nguyen') and int(args.benchmark.strip('nguyen'))<=6:
-        X = np.random.uniform(-1, 1, 20)
-    elif args.benchmark == 'nguyen7':
-        X = np.random.uniform(0, 2, 20)
-    elif args.benchmark == 'nguyen8':
-        X = np.random.uniform(0, 4, 20)
-    else:
-        X = np.random.uniform(-1, 1, 20)
-    sr_instance = SR(X, F)
+
     dirname = args.dirname
     os.makedirs(dirname, exist_ok=True)
-    log_file = f'{dirname}/run-{INSTANCE}'
-    print(f'Logging to {log_file}', flush=True)
-    global LOG_FILE
-    with open(log_file, 'w') as LOG_FILE:
-        match ALGORITHM:
-            case 'one-plus-lambda':
-                one_plus_lambda(max_evaluations=NUM_EVALUATIONS,
-                                lmbda=LAMBDA,
-                                sr_instance=sr_instance,
-                                tree_init_depth=(MIN_INIT_TREE_DEPTH, MAX_INIT_TREE_DEPTH),
-                                max_subtree_depth=MAX_SUBTREE_DEPTH,
-                                stopping_criteria=IDEAL_COST)
-            case 'mu-plus-lambda':
-                mu_plus_lambda(max_evaluations=NUM_EVALUATIONS,
-                               mu=MU,
-                               lmbda=LAMBDA,
-                               sr_instance=sr_instance,
-                               crossover_rate=CROSSOVER_RATE,
-                               mutation_rate=MUTATION_RATE,
-                               tree_init_depth=(MIN_INIT_TREE_DEPTH, MAX_INIT_TREE_DEPTH),
-                               max_subtree_depth=MAX_SUBTREE_DEPTH,
-                               stopping_criteria=IDEAL_COST)
-            case 'canonical-ea':
-                canonical_ea(max_evaluations=NUM_EVALUATIONS,
-                             sr_instance=sr_instance,
-                             population_size=POPULATION_SIZE,
-                             tree_init_depth=(MIN_INIT_TREE_DEPTH, MAX_INIT_TREE_DEPTH),
-                             max_subtree_depth=MAX_SUBTREE_DEPTH,
-                             crossover_rate=CROSSOVER_RATE,
-                             mutation_rate=MUTATION_RATE,
-                             tournament_size=TOURNAMENT_SIZE,
-                             stopping_criteria=IDEAL_COST,
-                             num_elites=NUM_ELITES)
-            case 'ftg':
-                ftg(max_evaluations=NUM_EVALUATIONS,
-                    sr_instance=sr_instance,
-                    stopping_criteria=IDEAL_COST)
+    for i in range(INSTANCE, INSTANCE + args.cnt):
+        np.random.seed(i)
+        random.seed(i)
+        if args.benchmark.startswith('nguyen') and int(args.benchmark.lstrip('nguyen'))<=6:
+            X = np.random.uniform(-1, 1, 20)
+        elif args.benchmark == 'nguyen7':
+            X = np.random.uniform(0, 2, 20)
+        elif args.benchmark == 'nguyen8':
+            X = np.random.uniform(0, 4, 20)
+        else:
+            X = np.random.uniform(-1, 1, 20)
+        sr_instance = SR(X, F)
+        log_file = f'{dirname}/run-{i}'
+        print(f'Logging to {log_file}', flush=True)
+        global LOG_FILE
+        with open(log_file, 'w') as LOG_FILE:
+            match ALGORITHM:
+                case 'one-plus-lambda':
+                    one_plus_lambda(max_evaluations=NUM_EVALUATIONS,
+                                    lmbda=LAMBDA,
+                                    sr_instance=sr_instance,
+                                    tree_init_depth=(MIN_INIT_TREE_DEPTH, MAX_INIT_TREE_DEPTH),
+                                    max_subtree_depth=MAX_SUBTREE_DEPTH,
+                                    stopping_criteria=IDEAL_COST)
+                case 'mu-plus-lambda':
+                    mu_plus_lambda(max_evaluations=NUM_EVALUATIONS,
+                                   mu=MU,
+                                   lmbda=LAMBDA,
+                                   sr_instance=sr_instance,
+                                   crossover_rate=CROSSOVER_RATE,
+                                   mutation_rate=MUTATION_RATE,
+                                   tree_init_depth=(MIN_INIT_TREE_DEPTH, MAX_INIT_TREE_DEPTH),
+                                   max_subtree_depth=MAX_SUBTREE_DEPTH,
+                                   stopping_criteria=IDEAL_COST)
+                case 'canonical-ea':
+                    canonical_ea(max_evaluations=NUM_EVALUATIONS,
+                                 sr_instance=sr_instance,
+                                 population_size=POPULATION_SIZE,
+                                 tree_init_depth=(MIN_INIT_TREE_DEPTH, MAX_INIT_TREE_DEPTH),
+                                 max_subtree_depth=MAX_SUBTREE_DEPTH,
+                                 crossover_rate=CROSSOVER_RATE,
+                                 mutation_rate=MUTATION_RATE,
+                                 tournament_size=TOURNAMENT_SIZE,
+                                 stopping_criteria=IDEAL_COST,
+                                 num_elites=NUM_ELITES)
+                case 'ftg':
+                    ftg(max_evaluations=NUM_EVALUATIONS,
+                        sr_instance=sr_instance,
+                        stopping_criteria=IDEAL_COST)
 
 
 if __name__ == '__main__':
