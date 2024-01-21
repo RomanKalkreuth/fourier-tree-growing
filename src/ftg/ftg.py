@@ -2,23 +2,15 @@ import sys
 sys.path.insert(0, '../gp/gpsimple')
 
 import copy
-from gp_tree import GPNode
-from gp_simple import GPSimple
-import gp_config as config
-import gp_problem as problem
-import gp_fitness as fitness
-import gp_util as util
-
-import src.benchmark.symbolic_regression.dataset_generator as generator
+import src.representation.parse_tree as parse_tree
 import src.benchmark.symbolic_regression.benchmark_functions as benchmarks
-
 import math
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import time
 import sys
-from sympy import *
+import util.util as util
 
 
 def eprintf(*args, **kwargs):
@@ -30,12 +22,12 @@ def toseq(x_bar, f):
 
 
 def inner_prod(x1, x2):
-    return np.dot(x1.losses, x2.losses)
+    return np.dot(x1.vec, x2.vec)
 
 
 def minus_fun(x1, x2):
     fun = Fun(None, None)
-    fun.vec = x1.losses - x2.losses
+    fun.vec = x1.vec - x2.vec
     return fun
 
 
@@ -59,7 +51,9 @@ def proj_to_hyperplane(x, basis):
     G = gram(basis)
     eprintf('det', np.linalg.det(G))
     eprintf('cond', np.linalg.cond(G))
-    return np.dot(np.linalg.inv(gram(basis)), proj_to_basis(x, basis))
+    u,s,v=np.linalg.svd(G)
+    Ginv=np.dot(v.transpose(),np.dot(np.diag(s**-1),u.transpose()))
+    return np.dot(Ginv, proj_to_basis(x, basis))
 
 
 class Fun:
@@ -71,7 +65,7 @@ class Fun:
 
 def gen_tree(fs):
     GPSimple.init(None, None)
-    tree = GPNode()
+    tree = parse_tree.ParseTree()
     tree.init_tree(1, 1)
     tree.symbol = 'x'
     tree.print_tree()
@@ -90,7 +84,7 @@ def linear_combination_of_trees_to_function(alpha, trees):
 
 
 def is_inner_prod_zero(inner_prod_value):
-    return abs(inner_prod_value) < 1e-5
+    return abs(inner_prod_value) < 1e-3
 
 
 def is_linear_dependent(Z, f_hat_fun, gi_fun):
@@ -129,19 +123,18 @@ class Vis:
 
 
 def gentree():
-    gi = GPNode()
+    gi = parse_tree.ParseTree()
     gi.init_tree(1, 10)
     return gi
 
 
 def main2():
-    GPSimple.init(None, None)
-    F = benchmarks.nguyen5
+    F = benchmarks.koza1
     minx, maxx = -1, 1
     X_train = np.random.uniform(minx, maxx, 20)
 
     F_fun = Fun(X_train, F)
-    t1 = GPNode()
+    t1 = parse_tree.ParseTree()
     t1.symbol = 1
     ts = [t1]
 
@@ -153,33 +146,33 @@ def main2():
     eprintf(loss)
     print('loss', loss)
 
-    vis = Vis(minx, maxx, X_train, F)
-    vis.add_function(F_hat)
+    # vis = Vis(minx, maxx, X_train, F)
+    # vis.add_function(F_hat)
 
     spent_budget = 2
-    for i in range(2, 10):
+    for i in range(2, 20):
         if loss < 1e-5:
             break
         ts.append(gentree())
         basis.append(Fun(X_train, lambda x: ts[-1].evaluate(x)))
         spent_budget += 1
         while is_linear_dependent(F_fun, F_hat_fun, basis[-1]):
-            eprintf('ti', util.generate_symbolic_expression(ts[-1]))
+            eprintf('ti', util.generate_symbolic_expression(ts[-1],parse_tree.FUNCTIONS))
             spent_budget += 2
             ts[-1] = gentree()
             basis[-1] = Fun(X_train, lambda x: ts[-1].evaluate(x))
             spent_budget += 1
-        eprintf('ti', util.generate_symbolic_expression(ts[-1]))
+        eprintf('ti', util.generate_symbolic_expression(ts[-1],parse_tree.FUNCTIONS))
         alpha = proj_to_hyperplane(F_fun, basis)
-        spent_budget += len(basis)*(len(basis)+1)/2 + len(basis)
+        spent_budget += 2 * i
         F_hat = linear_combination_of_trees_to_function(alpha, ts)
         F_hat_fun = Fun(X_train, F_hat)
         spent_budget += 1
-        vis.add_function(F_hat)
+        # vis.add_function(F_hat)
         loss = loss_mse(X_train, F, F_hat)
         eprintf(loss)
         print('loss', loss)
-    vis.build_save_close('vis-1.pdf')
+    # vis.build_save_close('vis-1.pdf')
     eprintf(spent_budget)
     print('budget', spent_budget)
 
