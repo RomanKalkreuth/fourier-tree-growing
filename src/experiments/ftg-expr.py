@@ -22,6 +22,9 @@ def mylog(gen, y, fy, num_evals):
     print(f'gen:{gen}', f'num_evals:{num_evals}', f'depth:{y.depth()}', f'size:{y.size()}', f'loss:{fy:.15f}', sep=', ', file=LOG_FILE)
 
 
+def mylog_ftg(gen, y, fy, num_evals, cond, num_retries):
+    print(f'gen:{gen}', f'num_evals:{num_evals}', f'depth:{y.depth()}', f'size:{y.size()}', f'cond:{cond:.3f}', f'loss:{fy:.15f}', f'retries:{num_retries}', sep=', ', file=LOG_FILE)
+
 def eprintf(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
 
@@ -89,6 +92,10 @@ class SRGrammMatrix:
             return None
         return Ginv
 
+    def get_cond(self):
+        G = np.array(self.py_matrix)
+        return np.linalg.cond(G)
+
 
 def treegen():
     v = parse_tree.ParseTree()
@@ -137,23 +144,29 @@ def ftg(max_evaluations, sr_instance, stopping_criteria=0):
     cnt_tree = 1
     vs = [v1]
     prvloss = float("inf")
-    while sr_instance.num_evals < max_evaluations:
+    num_retries = 0
+    while True:
         loss = sr_instance.loss(F_hat)
         print(f'trees {cnt_tree}, loss {loss:.10f}')
-        mylog(cnt_tree, F_hat, loss, sr_instance.num_evals)
+        mylog_ftg(cnt_tree, F_hat, loss, sr_instance.num_evals, G.get_cond(), num_retries)
+        num_retries = 0
         if loss > prvloss:
-            print('numerical errors')
+            print('termination: numerical errors', file=LOG_FILE)
             break
         if cnt_tree >= len(sr_instance.X):
-            print('spanned all the space')
+            print('termination: spanned all the space', file=LOG_FILE)
+            break
+        if sr_instance.num_evals >= max_evaluations:
+            print('termination: exhaust all the budget', file=LOG_FILE)
             break
         if loss <= stopping_criteria:
-            print('found good enough solution')
+            print('termination: found good enough solution', file=LOG_FILE)
             break
         perp = np.array([sr_instance.F(x) - sr_instance._eval_obj(F_hat, x) for x in sr_instance.X])
         sr_instance.num_evals += 1
         Ginv = None
         while Ginv is None:
+            num_retries += 1
             v = treegen()
             while np.abs(np.dot(perp, sr_instance.eval_on_dataset(v))) < EPS:
                 v = treegen()
@@ -161,17 +174,16 @@ def ftg(max_evaluations, sr_instance, stopping_criteria=0):
             cnt_tree += 1
             vs.append(v)
             G.add(v)
-            fc.append(sr_instance.inner_q_space(sr_instance.F, v))
             Ginv = G.get_inverse()
             if Ginv is None:
                 G.pop()
-                fc.pop()
                 vs.pop()
                 cnt_tree -= 1
             if sr_instance.num_evals >= max_evaluations:
-                mylog(cnt_tree, F_hat, loss, sr_instance.num_evals)
-                print('exhaust all the budget before lnd function is found')
+                mylog_ftg(cnt_tree, F_hat, loss, sr_instance.num_evals, G.get_cond(), num_retries)
+                print('termination: exhaust all the budget before lnd function is found', file=LOG_FILE)
                 return
+        fc.append(sr_instance.inner_q_space(sr_instance.F, v))
         alpha = np.dot(Ginv, np.array(fc))
         F_hat = create_tree(alpha, vs)
     return F_hat
