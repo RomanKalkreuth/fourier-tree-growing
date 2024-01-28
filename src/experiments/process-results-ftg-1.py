@@ -74,7 +74,8 @@ def parse_file(filename):
     fi.instance_number = int(os.path.basename(filename).lstrip('run-'))
     with open(filename, 'r') as file:
         for line in file:
-            if line.split(' ')[0] == 'Target':
+            w1 = line.split(' ')[0]
+            if w1 == 'Target' or w1 == 'termination:':
                 continue
             gen, depth, size, loss, num_evals = parse_line(line)
             if gen == None:
