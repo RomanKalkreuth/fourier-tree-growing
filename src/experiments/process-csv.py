@@ -13,6 +13,7 @@ mpl.rcParams['ps.fonttype'] = 42
 # Read the CSV file into a DataFrame
 df = pd.read_csv(csvfilename, low_memory=False)
 algs = ['canonical-ea', 'one-plus-lambda']
+names = ['Canonical-GP', r'$(1 + \lambda)$-GP']
 colors = ['blue', 'green']
 fig, axs = plt.subplots(4, 4, figsize=(15, 10))
 legends = []
@@ -46,7 +47,7 @@ for lambda_ in [500]:
                     x = df1['gen_number'].values
                     y = df1[mean_name].values
                     err = df1[err_name].values
-                    li, = ax.plot(x, y, c=colors[i], label=algs[i])
+                    li, = ax.plot(x, y, c=colors[i], label=names[i])
                     ax.fill_between(x, y - err, y + err,
                                     facecolor=colors[i], alpha=0.20)
                     legends.append(li)
