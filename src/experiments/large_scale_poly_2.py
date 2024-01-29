@@ -94,12 +94,12 @@ class Poly:
         ans, rest = 0, 0
         for d, c in zip(self.ds, self.cs):
             if ~d & 1:
-                if type(c) == int:
-                    x = c // (d + 1)
-                    rest += (c - x * (d + 1)) / (d + 1)
-                    ans += x
-                else:
-                    ans += c / (d + 1)
+                # if type(c) == int:
+                    # x = c // (d + 1)
+                    # rest += (c - x * (d + 1)) / (d + 1)
+                    # ans += x
+                # else:
+                ans += c / (d + 1)
         return 2 * ans + 2 * rest
 
     # integration with limits 0, 1
@@ -114,7 +114,10 @@ class Poly:
                 ans += c / (d + 1)
         return ans + rest
 
-TREE_CS_TYPE=int
+
+# TREE_CS_TYPE = int
+
+
 def tree_to_poly(tree):
     if not tree:
         return Poly([], [])
@@ -122,8 +125,8 @@ def tree_to_poly(tree):
     poly_right = tree_to_poly(tree.right)
     if tree.symbol in VARIABLES:
         return Poly([1], [1])
-    elif type(tree.symbol)==TREE_CS_TYPE:
-        return Poly([0], [TREE_CS_TYPE(tree.symbol)])
+    elif type(tree.symbol) == int or type(tree.symbol) == float or type(tree.symbol) == np.float64:
+        return Poly([0], [tree.symbol])
     elif tree.symbol == Mathematical.add or tree.symbol == Mathematical.sub:
         return poly_left.additive_op(tree.symbol, poly_right)
     elif tree.symbol == Mathematical.mul:
@@ -164,6 +167,165 @@ def loss(F, y_poly):
 
 def mylog(gen, y, fy, y_poly):
     print(f'gen:{gen}', f'depth:{y.depth()}', f'size:{y.size()}', f'loss:{fy:.15f}', poly_to_str(y_poly, True), sep=', ', file=LOG_FILE)
+
+
+EPS = 1e-3
+
+
+def mylog_ftg(gen, y, fy, y_poly, num_evals, cond, num_retries):
+    print(f'gen:{gen}', f'depth:{y.depth()}', f'size:{y.size()}', f'num_evals:{num_evals}', f'cond:{cond:.3f}', f'loss:{fy:.15f}', f'retries:{num_retries}', poly_to_str(y_poly, True), sep=', ', file=LOG_FILE)
+
+
+def eprintf(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
+
+
+class SR:
+    def __init__(self, F):
+        self.F = F
+        self.num_evals = 0
+
+    def loss(self, f):
+        self.num_evals += 1
+        return loss(self.F, f)
+
+    def inner_q_space(self, v1, v2):
+        self.num_evals += 1
+        v1_copy = Poly(v1.ds, v1.cs)
+        v1_copy.mul(v2)
+        return v1_copy.integrate1()
+
+
+class SRGrammMatrix:
+    def __init__(self, sr_instance):
+        self.elements = []
+        self.py_matrix = []
+        self.sr_instance = sr_instance
+
+    def add(self, element):
+        self.elements.append(element)
+        for i in range(len(self.py_matrix)):
+            self.py_matrix[i].append(self.sr_instance.inner_q_space(self.elements[i], element))
+        new_row = []
+        for e in self.elements:
+            new_row.append(self.sr_instance.inner_q_space(e, element))
+        self.py_matrix.append(new_row)
+
+    def pop(self):
+        self.elements.pop()
+        self.py_matrix.pop()
+        for p in self.py_matrix:
+            p.pop()
+
+    def get_inverse(self):
+        G = np.array(self.py_matrix)
+        # print('cond number:', np.linalg.cond(G))
+        # return np.linalg.inv(G)
+        u, s, v = np.linalg.svd(G)
+        Ginv = np.dot(v.transpose(), np.dot(np.diag(s ** -1), u.transpose()))
+        if not np.allclose(np.dot(G, Ginv), np.identity(len(G)), atol=1e-4):
+            return None
+        return Ginv
+
+    def get_cond(self):
+        G = np.array(self.py_matrix)
+        return np.linalg.cond(G)
+
+
+def treegen():
+    v = parse_tree.ParseTree()
+    v.init_tree(1, 10)
+    return v
+
+
+def create_tree(alpha, v):
+    if len(v) == 0:
+        return None
+    tm = parse_tree.ParseTree()
+    tm.symbol = Mathematical.mul
+    tm.left = parse_tree.ParseTree()
+    tm.left.symbol = alpha[0]
+    tm.right = v[0]
+    if len(v) == 1:
+        # eprintf('composed:', util.generate_symbolic_expression(tm,parse_tree.FUNCTIONS))
+        return tm
+    left = tm
+    cnt = 1
+    while cnt < len(v):
+        ta = parse_tree.ParseTree()
+        ta.symbol = Mathematical.add
+        ta.left = left
+        tm = parse_tree.ParseTree()
+        tm.symbol = Mathematical.mul
+        tm.left = parse_tree.ParseTree()
+        tm.left.symbol = alpha[cnt]
+        tm.right = v[cnt]
+        ta.right = tm
+        left = ta
+        cnt += 1
+    # eprintf('composed:', util.generate_symbolic_expression(left,parse_tree.FUNCTIONS))
+    return left
+
+
+def ftg(max_evaluations, sr_instance, stopping_criteria=0):
+    G = SRGrammMatrix(sr_instance)
+    v1 = parse_tree.ParseTree()
+    v1.symbol = 1
+    v1_poly = tree_to_poly(v1)
+    G.add(v1_poly)
+    fc = [sr_instance.inner_q_space(sr_instance.F, v1_poly)]
+    Ginv = G.get_inverse()
+    alpha1 = np.dot(Ginv, np.array(fc))
+    F_hat = create_tree(alpha1, [v1])
+    cnt_tree = 1
+    vs = [v1]
+    loss = float("inf")
+    num_retries = 0
+    while True:
+        F_hat_poly = tree_to_poly(F_hat)
+        prvloss = loss
+        loss = sr_instance.loss(F_hat_poly)
+        print(f'trees {cnt_tree}, loss {loss:.10f}')
+        num_retries = 0
+        if loss > prvloss:
+            print('termination: numerical errors', file=LOG_FILE)
+            break
+        mylog_ftg(cnt_tree, F_hat, loss, F_hat_poly, sr_instance.num_evals, G.get_cond(), num_retries)
+        if sr_instance.num_evals >= max_evaluations:
+            print('termination: exhaust all the budget', file=LOG_FILE)
+            break
+        if loss <= stopping_criteria:
+            print('termination: found good enough solution', file=LOG_FILE)
+            break
+        # perp = np.array([sr_instance.F(x) - sr_instance._eval_obj(F_hat, x) for x in sr_instance.X])
+        perp_poly = Poly(sr_instance.F.ds, sr_instance.F.cs)
+        perp_poly.sub(F_hat_poly)
+        Ginv = None
+        while Ginv is None:
+            num_retries += 1
+            v = treegen()
+            v_poly = tree_to_poly(v)
+            while sr_instance.inner_q_space(perp_poly, v_poly) < EPS:
+            # while np.abs(np.dot(perp, sr_instance.eval_on_dataset(v))) < EPS:
+                v = treegen()
+                v_poly = tree_to_poly(v)
+            # eprintf('generated:', util.generate_symbolic_expression(v, parse_tree.FUNCTIONS))
+            cnt_tree += 1
+            vs.append(v)
+            G.add(v_poly)
+            Ginv = G.get_inverse()
+            if Ginv is None:
+                G.pop()
+                vs.pop()
+                cnt_tree -= 1
+            if sr_instance.num_evals >= max_evaluations:
+                mylog_ftg(cnt_tree, F_hat, loss, F_hat_poly, sr_instance.num_evals, G.get_cond(), num_retries)
+                print('termination: exhaust all the budget before lnd function is found', file=LOG_FILE)
+                return
+        fc.append(sr_instance.inner_q_space(sr_instance.F, v_poly))
+        alpha = np.dot(Ginv, np.array(fc))
+        F_hat = create_tree(alpha, vs)
+    return F_hat
 
 
 def one_plus_lambda(max_evaluations, lmbda, F,
@@ -393,7 +555,7 @@ def main():
     required_named.add_argument("--instance", type=int, help="Number of the run")
     required_named.add_argument("--dirname", type=str, help="Name of the directory with result")
     required_named.add_argument("--algorithm", type=str, help="Search algorithm",
-                                choices=['one-plus-lambda', 'canonical-ea'])
+                                choices=['ftg', 'one-plus-lambda', 'canonical-ea'])
     required_named.add_argument("--constant", type=str, help="Constants in terminals",
                                 choices=['none', '1', 'koza-erc'])
 
@@ -413,9 +575,9 @@ def main():
     elif args.constant == '1':
         parse_tree.set_terminals(['x', 1])
     elif args.constant == 'koza-erc':
-        global TREE_CS_TYPE
+        # global TREE_CS_TYPE
         parse_tree.set_terminals(['x', constants.koza_erc])
-        TREE_CS_TYPE = float
+        # TREE_CS_TYPE = float
 
     match ALGORITHM:
         case 'one-plus-lambda':
@@ -440,6 +602,7 @@ def main():
             if args.nelites:
                 NUM_ELITES = args.nelites
     F = Poly([i for i in range(DEGREE + 1)], [1 for _ in range(DEGREE + 1)])
+    sr_instance = SR(F)
     if args.constant == 'none':
         F = Poly([i for i in range(1, DEGREE + 1)], [1 for _ in range(1, DEGREE + 1)])
     # F = Poly([DEGREE], [1])
@@ -479,6 +642,10 @@ def main():
                              tournament_size=TOURNAMENT_SIZE,
                              stopping_criteria=IDEAL_COST,
                              num_elites=NUM_ELITES)
+            case 'ftg':
+                ftg(max_evaluations=NUM_EVALUATIONS,
+                    sr_instance=sr_instance,
+                    stopping_criteria=IDEAL_COST)
         print('Target function:', poly_to_str(F, True), file=LOG_FILE)
 
 
