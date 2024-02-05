@@ -3,7 +3,7 @@ import numpy as np
 import datetime
 import argparse
 
-CS_DTYPE = int
+CS_DTYPE = np.float64
 def parse_poly_str(str_poly):
     ds, cs = [], []
     sign = 1
