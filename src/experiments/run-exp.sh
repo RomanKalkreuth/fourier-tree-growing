@@ -7,11 +7,11 @@ do
         if [ "$alg" == "canonical-ea" -a $lambda -eq 1 ]; then
             continue
         fi
-        for degree in 10 20 50 100
+        for degree in 10 100
         do
-            for constant in 'none' '1' 'koza-erc'
+            for constant in '1' 'koza-erc'
             do
-                for (( instance=0; instance<5; instance++ ))
+                for (( instance=0; instance<15; instance++ ))
                 do
                     #echo Exp_${timestamp}/A-${alg}_L${lambda}_D${degree}_C-${constant}_$timestamp
                     $(nohup python $python_script --instance $instance --algorithm $alg --dirname Exp_${timestamp}/A-${alg}_L${lambda}_D${degree}_C-${constant}_$timestamp --degree $degree --constant $constant --lmbda $lambda > /dev/null &)

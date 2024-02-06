@@ -4,7 +4,6 @@ import myrandom
 import argparse
 import src.representation.parse_tree as parse_tree
 from src.representation.parse_tree import ParseTree, FUNCTIONS, VARIABLES, TERMINALS
-import src.analysis.analysis as analysis
 from src.functions.functions import Mathematical
 import numpy as np
 import src.variation.variation as variation
