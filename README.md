@@ -16,11 +16,8 @@ This project consists of several components designed to conduct experiments, ana
   - `symbolic_regression/`: A subset of benchmarks specifically designed for testing symbolic regression algorithms.
 - `util/`: Includes utility functions and helpers that provide general-purpose functionality used by other parts of the project.
  
-#### Key Components
- 
 Each directory contains Python scripts with specific roles within the project. For example, `selection.py` in the `selection/` directory would define how individuals are selected for reproduction or survival, while `variation.py` in the `variation/` directory would detail the mechanisms for generating diversity within the population.
 
- 
 #### Detailed Documentation of FTG
  
 - Implementation of experiments on conventional GP benchmarks are implemented in `src/experiments/ftg-expr.py`
