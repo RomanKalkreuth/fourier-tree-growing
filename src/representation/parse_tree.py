@@ -1,4 +1,4 @@
-from random import random, randint
+import myrandom
 import numpy as np
 import queue
 import src.util.util as util
@@ -43,28 +43,28 @@ class ParseTree:
         self.parent = parent
 
     def init_tree(self, min_depth: int, max_depth: int, grow=True):
-        rand_depth = randint(min_depth, max_depth)
+        rand_depth = myrandom.RND.randint(min_depth, max_depth)
 
-        if random() < 0.5:
+        if myrandom.RND.uniform(0, 1) < 0.5:
             self.random_tree(grow=grow, min_depth=min_depth, max_depth=rand_depth)
         else:
             self.random_tree(grow=False, min_depth=min_depth, max_depth=rand_depth)
 
     def random_tree(self, grow: bool, min_depth: int, max_depth: int, depth: int = 0):
         if depth >= max_depth - 1:
-            self.symbol = TERMINALS[randint(0, NUM_TERMINALS - 1)]
+            self.symbol = TERMINALS[myrandom.RND.randint(0, NUM_TERMINALS - 1)]
             if callable(self.symbol):
                 self.symbol = self.symbol()
         else:
             if grow is True:
-                if random() < 0.5 or depth < min_depth:
-                    self.symbol = FUNCTIONS[randint(0, NUM_FUNCTIONS - 1)]
+                if myrandom.RND.uniform(0, 1) < 0.5 or depth < min_depth:
+                    self.symbol = FUNCTIONS[myrandom.RND.randint(0, NUM_FUNCTIONS - 1)]
                 else:
-                    self.symbol = TERMINALS[randint(0, NUM_TERMINALS - 1)]
+                    self.symbol = TERMINALS[myrandom.RND.randint(0, NUM_TERMINALS - 1)]
                     if callable(self.symbol):
                         self.symbol = self.symbol()
             else:
-                self.symbol = FUNCTIONS[randint(0, NUM_FUNCTIONS - 1)]
+                self.symbol = FUNCTIONS[myrandom.RND.randint(0, NUM_FUNCTIONS - 1)]
 
             if self.symbol in FUNCTIONS:
 

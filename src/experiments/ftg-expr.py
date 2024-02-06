@@ -1,6 +1,6 @@
 import sys
 import os
-import random
+import myrandom
 import argparse
 import src.representation.parse_tree as parse_tree
 from src.representation.parse_tree import ParseTree, FUNCTIONS, VARIABLES, TERMINALS
@@ -16,6 +16,11 @@ import util.util as util
 
 
 EPS = 1e-3
+
+
+def set_log_file(logfile):
+    global LOG_FILE
+    LOG_FILE = open(logfile, 'w')
 
 
 def mylog(gen, y, fy, num_evals):
@@ -263,8 +268,8 @@ def mu_plus_lambda(max_evaluations, mu, lmbda, sr_instance,
     print(f'gen {0}:', best_cost)
     for gen in range(0, max_generations):
         for i in range(0, lmbda):
-            parent1 = parents[random.randint(0, mu - 1)]
-            parent2 = parents[random.randint(0, mu - 1)]
+            parent1 = parents[myrandom.RND.randint(0, mu - 1)]
+            parent2 = parents[myrandom.RND.randint(0, mu - 1)]
             ptree1, ptree2 = parent1[0], parent2[0]
 
             otree = breed_offspring(ptree1, ptree2, crossover_rate=crossover_rate,
@@ -473,16 +478,15 @@ def main():
     dirname = args.dirname
     os.makedirs(dirname, exist_ok=True)
     for i in range(INSTANCE, INSTANCE + args.cnt):
-        np.random.seed(i)
-        random.seed(i)
-        if args.benchmark.startswith('nguyen') and int(args.benchmark.lstrip('nguyen'))<=6:
-            X = np.random.uniform(-1, 1, 20)
+        myrandom.set_random_seed(i)
+        if args.benchmark.startswith('nguyen') and int(args.benchmark.lstrip('nguyen')) <= 6:
+            X = [myrandom.RND.uniform(-1, 1) for _ in range(20)]
         elif args.benchmark == 'nguyen7':
-            X = np.random.uniform(0, 2, 20)
+            X = [myrandom.RND.uniform(0, 2) for _ in range(20)]
         elif args.benchmark == 'nguyen8':
-            X = np.random.uniform(0, 4, 20)
+            X = [myrandom.RND.uniform(0, 4) for _ in range(20)]
         else:
-            X = np.random.uniform(-1, 1, 20)
+            X = [myrandom.RND.uniform(-1, 1) for _ in range(20)]
         sr_instance = SR(X, F)
         log_file = f'{dirname}/run-{i}'
         print(f'Logging to {log_file}', flush=True)

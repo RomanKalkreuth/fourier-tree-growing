@@ -1,11 +1,11 @@
-import random as random
+import myrandom
 
 def tournament_selection(population, k=2, minimizing_fitness=True):
     n = len(population)
     tournament = []
 
     for i in range(k):
-        rand_index = random.randint(0, n - 1)
+        rand_index = myrandom.RND.randint(0, n - 1)
         rand_ind = population[rand_index]
         tournament.append(rand_ind)
 

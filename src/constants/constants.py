@@ -1,9 +1,9 @@
-import random as random
+import myrandom
 
 def koza_erc():
     a = 1.0
     b = -1.0
-    return random.uniform(b, a)
+    return myrandom.RND.uniform(b, a)
 
 
 

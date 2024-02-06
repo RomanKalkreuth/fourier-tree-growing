@@ -1,6 +1,6 @@
 import sys
 import os
-import random
+import myrandom
 import argparse
 import src.representation.parse_tree as parse_tree
 from src.representation.parse_tree import ParseTree, FUNCTIONS, VARIABLES, TERMINALS
@@ -13,6 +13,11 @@ import src.constants.constants as constants
 from operator import itemgetter
 
 LOG_FILE = None
+
+
+def set_log_file(logfile):
+    global LOG_FILE
+    LOG_FILE = open(logfile, 'w')
 
 
 class Poly:
@@ -403,8 +408,8 @@ def mu_plus_lambda(max_evaluations, mu, lmbda, F,
     print(f'gen {0}:', best_cost)
     for gen in range(0, max_generations):
         for i in range(0, lmbda):
-            parent1 = parents[random.randint(0, mu - 1)]
-            parent2 = parents[random.randint(0, mu - 1)]
+            parent1 = parents[myrandom.RND.randint(0, mu - 1)]
+            parent2 = parents[myrandom.RND.randint.randint(0, mu - 1)]
             ptree1, ptree2 = parent1[0], parent2[0]
 
             otree = breed_offspring(ptree1, ptree2, crossover_rate=crossover_rate,
@@ -562,8 +567,7 @@ def main():
     args = parser.parse_args()
 
     INSTANCE = args.instance
-    np.random.seed(INSTANCE)
-    random.seed(INSTANCE)
+    myrandom.set_random_seed(INSTANCE)
     DEGREE = args.degree
     ALGORITHM = args.algorithm
     if args.evaluations:

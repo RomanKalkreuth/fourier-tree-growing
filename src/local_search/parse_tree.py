@@ -10,9 +10,8 @@ class ParseTree:
         self.right = right
         self.parent = parent
 
-
     def init_tree(self, min_depth: int, max_depth: int, grow=True):
-        rand_depth = randint(min_depth, max_depth)
+        rand_depth = myrandom.RND.randint(min_depth, max_depth)
 
         if random() < 0.5:
             self.random_tree(grow=grow, min_depth=min_depth, max_depth=rand_depth)
